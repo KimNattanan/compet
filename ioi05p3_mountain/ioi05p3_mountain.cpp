@@ -7,33 +7,32 @@ using namespace std;
 #define pb push_back
 #define ll long long
 
-//#define int ll
+#define int ll
 
 const int inf=1e9+7;
 
 int n;
 
 struct A{
-    int l,r;
+    int l,r,mid,cnt;
     bool call;
     int lazy;
-    ll sum,mx;
+    int sum,mx;
     vector<A> adj;
     A(int _l=1,int _r=n,int _sum=0,int _mx=0){
-        l=_l,r=_r;
+        l=_l,r=_r,mid=l+(r-l>>1),cnt=(r-l+1);
         call=lazy=0;
         sum=_sum,mx=_mx;
-        adj.clear();
     }
     void flush(){
         if(adj.empty()&&l!=r){
-            adj.emplace_back(l,l+(r-l>>1));
-            adj.emplace_back(1+l+(r-l>>1),r);
+            adj.emplace_back(l,mid);
+            adj.emplace_back(mid+1,r);
         }
         if(call){
 
-            sum=lazy*(r-l+1);
-            mx=max(1LL*lazy,sum);
+            sum=lazy*cnt;
+            mx=max(lazy,sum);
             if(!adj.empty()){
                 adj[0].call=adj[1].call=1;
                 adj[0].lazy=adj[1].lazy=lazy;
@@ -52,7 +51,7 @@ struct A{
         if(adj[0].mx>x) return adj[0].query(x);
         return adj[1].query(x-adj[0].sum);
     }
-    void upd(int &l0,int &r0,int &x){
+    void upd(int l0,int r0,int x){
         flush();
         if(r<l0||l>r0) return;
         if(l>=l0&&r<=r0){
