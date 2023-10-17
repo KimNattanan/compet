@@ -3,52 +3,36 @@
 
 using namespace std;
 
-unordered_set<long long> mp;
-
 int main(int argc, char *argv[]) {
     registerGen(argc, argv, 1);
 
-    int mx=opt<int>(1);
-    int X=rnd.next(0, 1000000000);
-    int Y=rnd.next(0, 1000000000);
-    int Z=rnd.next(0, 1000000000);
+    int sub=opt<int>(1);
+    int X,Y,Z;
+    X=rnd.next(200000,100000000);
+    if(sub==1) Y=0;
+    else Y=rnd.next(200000,100000000);
+    if(sub==1||sub==2) Z=0;
+    else Z=rnd.next(200000,100000000);
     cout<<X<<" "<<Y<<" "<<Z<<endl;
-
+    int d0,d1,d2,d3,x,y,z;
+    x=rnd.next(0,X);
+    y=rnd.next(0,Y);
+    z=rnd.next(0,Z);
+    d0=x+y+z;
+    d1=(X-x)+y+z;
+    d2=x+(Y-y)+z;
+    d3=x+y+(Z-z);
+    cout<<d0<<" "<<d1<<" "<<d2<<" "<<d3<<endl;
     int n;
-    if(mx<=5005) n=rnd.next(0,mx);
-    else n=rnd.next(100000,mx);
-    cout<<n;
-
+    n=rnd.next(1,500000);
+    cout<<n<<endl;
     for(int i=1;i<=n;++i){
-        int p,x,y,z,vx,vy,vz;
-
-        p=rnd.next(0, 1000000000);
-        x=rnd.next(-1000000000, 1000000000);
-        y=rnd.next(-1000000000, 1000000000);
-        z=rnd.next(-1000000000, 1000000000);
-
-        int t=rnd.next(0,1000000000);
-        while(mp.find(t)!=mp.end()) t=(t+1)%1000000001;
-        mp.insert(t);
-
-        double t1=rnd.next(1.0*t+0.9);
-        double t2=rnd.next((1.0*t+0.9)-t1);
-        double t3=(1.0*t+0.9)-t1-t2;
-
-        if(int(t1)==0) vx=1000000000;
-        else vx=max(1,int(1.0*abs(x-X)/t1));
-        if(int(t2)==0) vy=1000000000;
-        else vy=max(1,int(1.0*abs(y-Y)/t2));
-        if(int(t3)==0) vz=1000000000;
-        else vz=max(1,int(1.0*abs(z-Z)/t3));
-
-        vx=min(vx,1000000000);
-        vy=min(vy,1000000000);
-        vz=min(vz,1000000000);
-
-        cout<<endl<<p<<" "<<x<<" "<<y<<" "<<z<<" "<<vx<<" "<<vy<<" "<<vz;
+        int vx,vy,vz;
+        vx=rnd.next(1,max(1,x/rnd.next(12,9876 )) );
+        vy=rnd.next(1,max(1,y/rnd.next(56,4912 )));
+        vz=rnd.next(1,max(1,z/rnd.next(87,14438 )));
+        cout<<vx<<" "<<vy<<" "<<vz<<endl;
     }
-    cout<<endl;
 
     return 0;
 }
