@@ -1,14 +1,9 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define endl '\n'
-#define pii pair<int,int>
-#define f first
-#define s second
-#define ll long long
 #define pb push_back
 
-const int inf=1e9+7;
-const int md=1e9+7;
+
 
 vector<int> adj[100005];
 int sz[100005],heavy[100005],p0[100005];
@@ -99,6 +94,8 @@ int hld_query(int u,int v){
     if(tour[u]>tour[v]) swap(u,v);
     return sum+tree.query(tour[u],tour[v]);
 }
+
+
 
 int32_t main(){
     ios::sync_with_stdio(false); cin.tie(0);
