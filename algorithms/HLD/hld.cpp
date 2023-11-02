@@ -4,7 +4,6 @@ using namespace std;
 #define pb push_back
 
 
-
 vector<int> adj[100005];
 int sz[100005],heavy[100005],p0[100005];
 int tour[100005],idx,head[100005];
