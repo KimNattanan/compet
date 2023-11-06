@@ -27,7 +27,7 @@ void decomp(int u,int p){
 
     //...
 
-    for(auto &v:adj[u]){
+    for(auto &v:adj[c]){
         if(!vis[v]) decomp(v,c);
     }
 }
