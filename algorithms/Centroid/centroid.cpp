@@ -2,42 +2,35 @@
 using namespace std;
 #define pb push_back
 
+vector<int> adj[100005];
+bool vis[100005];
+int sz[100005];
 
-vector<int> adj[200005];
-int ans[200005];
-int sz[200005];
-bool vis[200005];
-
-void dfs_sz(int u,int p){
+int dfs_sz(int u,int p){
     sz[u]=1;
     for(auto &v:adj[u]){
-        if(v!=p&&!vis[v]){
-            dfs_sz(v,u);
-            sz[u]+=sz[v];
-        }
+        if(v!=p&&!vis[v]) sz[u]+=dfs_sz(v,u);
     }
+    return sz[u];
 }
+
 int centroid(int u,int p,int n){
     for(auto &v:adj[u]){
-        if(v!=p&&!vis[v]&&sz[v]>(n>>1)) return centroid(v,u,n);
+        if(v!=p&&!vis[v]&&sz[v]>n) return centroid(v,u,n);
     }
     return u;
 }
 
 void decomp(int u,int p){
-    dfs_sz(u,u);
-    int c=centroid(u,u,sz[u]);
+    int c=centroid(u,u,dfs_sz(u,u)>>1);
     vis[c]=1;
 
-    // ...
+    //...
 
-    for(auto &v:adj[c]){
-        if(!vis[v]){
-            decomp(v,c);
-        }
+    for(auto &v:adj[u]){
+        if(!vis[v]) decomp(v,c);
     }
 }
-
 
 int32_t main(){
     ios::sync_with_stdio(false); cin.tie(0);
@@ -48,11 +41,8 @@ int32_t main(){
         adj[u].pb(v);
         adj[v].pb(u);
     }
-    memset(ans,0x3f,sizeof ans);
 
     decomp(1,-1);
-
-    // ...
 
     return 0;
 }
