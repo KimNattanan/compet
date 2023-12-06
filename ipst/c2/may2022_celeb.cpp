@@ -13,7 +13,7 @@ struct line{
 struct cv_hull{
 	deque<line> dq;
 	long double f(line a,line b){
-		return 1.0*(a.c-b.c)/(b.m-a.m);
+		return (long double)(a.c-b.c)/(b.m-a.m);
 	}
 	bool replace(line a,line b,line c){
 		return f(b,c)>=f(a,b);
