@@ -1,7 +1,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-mt19937 rnd(time(0));
+mt19937 rng(time(0));
 
 struct treap{
     struct node{
@@ -9,7 +9,7 @@ struct treap{
         int cnt,prio;
         node *l,*r;
         bool lazy;
-        node(char val_):val(val_),cnt(1),prio(rnd()),l(nullptr),r(nullptr),lazy(0){}
+        node(char val_):val(val_),cnt(1),prio(rng()),l(nullptr),r(nullptr),lazy(0){}
     };
     using pitem=node*;
     pitem rt;
