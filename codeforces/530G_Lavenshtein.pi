@@ -1,0 +1,23 @@
+main=>
+    A=read_line(), 
+    B=read_line(),
+    LenA=length(A), 
+    LenB=length(B),
+    DP=new_array(LenA+1,LenB+1),
+    DP[1,1]=0,
+    foreach(I in 2..LenA+1)
+        DP[I,1]=DP[I-1,1]+ord(A[I-1])-96
+    end,
+    foreach(J in 2..LenB+1)
+        DP[1,J]=DP[1,J-1]+ord(B[J-1])-96
+    end,
+    foreach(I in 2..LenA+1,J in 2..LenB+1)
+        if(A[I-1]=B[J-1])then
+            DP[I,J]=DP[I-1,J-1]
+        else
+            DP[I,J]=DP[I-1,J]+ord(A[I-1])-96, 
+            DP[I,J]:=min(DP[I,J],DP[I,J-1]+ord(B[J-1])-96), 
+            DP[I,J]:=min(DP[I,J],DP[I-1,J-1]+abs(ord(A[I-1])-ord(B[J-1])))
+        end
+    end,
+    write(DP[LenA+1,LenB+1]).
