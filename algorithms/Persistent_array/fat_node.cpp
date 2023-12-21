@@ -5,7 +5,7 @@ using pii=pair<int,int>;
 #define f first
 #define s second
 
-struct persistent{
+struct persist{
 	vector<vector<pii>> vec;
 	void init(int n){
 		vec=vector<vector<pii>>(n,vector<pii>(1));
