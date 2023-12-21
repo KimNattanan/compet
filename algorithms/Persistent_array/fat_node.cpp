@@ -8,7 +8,7 @@ using pii=pair<int,int>;
 struct persist{
 	vector<vector<pii>> vec;
 	void init(int n){
-		vec=vector<vector<pii>>(n,vector<pii>(1));
+		vec=vector<vector<pii>>(n,vector<pii>(1,pii(-1,0)));
 	}
 	void add(int i,int t,int x){
 		vec[i].eb(t,x+vec[i].back().s);
