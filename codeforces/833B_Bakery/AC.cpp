@@ -31,7 +31,7 @@ void play(int l,int r,int optl,int optr,int k){
     play(l,mid-1,optl,best.second,k);
     play(mid+1,r,best.second,optr,k);
 }
- 
+
 int main(){
     ios::sync_with_stdio(false); cin.tie(0);
  
