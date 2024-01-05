@@ -84,6 +84,4 @@ long long minimum_energy(int N, int M, int K, std::vector<int> A, std::vector<in
         dijk();
     }
     return dist[N];
-
-	return 0;
 }
