@@ -20,7 +20,7 @@ int main(){
     }
     for(int i=K-1;i>0;--i){
         for(int j=0,m2=1;j<k;++j,m2<<=1){
-            if(i&j) dp[i^j]=min(dp[i^j],dp[i]);
+            if(i&m2) dp[i^j]=min(dp[i^j],dp[i]);
         }
     }
     for(int i=1;i<K;++i){
