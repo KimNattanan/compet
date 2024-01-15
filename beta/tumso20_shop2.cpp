@@ -8,58 +8,22 @@ using ll=long long;
 
 mt19937_64 rng(time(nullptr));
 ll rnd[100005],qs[100005];
+int ans;
 
 struct info{
-    deque<pair<int,ll>> dq1,dq2;
-    int ans1,ans2;
+    int mn,mx;
     ll sum;
-    info(int i=0):ans1(0),ans2(0),sum(0){
+    info(int i=0):mn(i),mx(i),sum(rnd[i]){
         if(!i) return;
-        sum=rnd[i];
-        dq1.eb(i,sum),dq2.eb(i,sum);
-        ans1=ans2=(i==1);
+
     }
-    void reverse(){
-        swap(dq1,dq2);
-        swap(ans1,ans2);
+    void rev(){
+
     }
     friend info operator+(info l,info r){
-        if(l.dq1.empty()) return r;
-        if(r.dq1.empty()) return l;
-        while(r.dq1.size()&&r.dq1.front().f<l.dq1.back().f) r.dq1.pop_front();
-        while(r.dq1.size()){
-            l.dq1.eb(r.dq1.front().f,l.sum+r.dq1.front().s);
-            r.dq1.pop_front();
-        }
-        while(l.dq2.size()&&l.dq2.front().f<r.dq2.back().f) l.dq2.pop_front();
-        while(l.dq2.size()){
-            r.dq2.eb(l.dq2.front().f,r.sum+l.dq2.front().s);
-            l.dq2.pop_front();
-        }
-        swap(l.dq2,r.dq2);
-        swap(l.ans2,r.ans2);
-        l.ans1=l.ans2=0;
-        int mx=0;
-        for(auto &e:l.dq1){
-            if(!mx){
-                mx=e.f;
-                continue;
-            }
-            if(e.s-rnd[e.f]==qs[mx]) ++l.ans1;
-            mx=e.f;
-        }
-        mx=0;
-        for(auto &e:l.dq2){
-            if(!mx){
-                mx=e.f;
-                continue;
-            }
-            if(e.s-rnd[e.f]==qs[mx]) ++l.ans2;
-            mx=e.f;
-        }
+        l.mn=min(l.mn,r.mn);
+        l.mx=max(l.mx,r.mx);
         l.sum+=r.sum;
-        if(l.sum==qs[l.dq1.back().f]) ++l.ans1;
-        if(l.sum==qs[l.dq2.back().f]) ++l.ans2;
         return l;
     }
 };
@@ -79,16 +43,17 @@ struct treap{
     info val(pnode t){return t?t->val:info();}
     void flush(pnode t){
         if(t&&t->lazy){
+            t->lazy=0;
             if(t->l) t->l->lazy^=1;
             if(t->r) t->r->lazy^=1;
-            t->lazy=0;
             swap(t->l,t->r);
-            t->val.reverse();
+            t->val.rev();
         }
     }
     void upd(pnode t){
         if(!t) return;
-        flush(t);
+        flush(t->l);
+        flush(t->r);
         t->sz=sz(t->l)+sz(t->r)+1;
         t->val=val(t->l)+info(t->num)+val(t->r);
     }
@@ -112,13 +77,26 @@ struct treap{
         split(rt,a,b,l-1);
         split(b,b,c,r-l+1);
         flush(b);
+        flush(a);
+        ll sum0=val(a).sum;
+        ans-=getAns(b,sum0,l-1);
         b->lazy^=1;
         flush(b);
+        ans+=getAns(b,sum0,l-1);
         merge(rt,a,b);
         merge(rt,rt,c);
     }
     void insert(int x){merge(rt,rt,new node(x));}
-    int getAns(){return val(rt).ans1;}
+    int getAns(pnode t,ll sum0,int sz0){
+        if(!t) return 0;
+        flush(t->l);
+        flush(t->r);
+        info valL=val(t->l);
+        return (sum0+valL.sum+rnd[t->num]==qs[sz0+sz(t->l)+1])+getAns(t->l,sum0,sz0)+getAns(t->r,sum0+valL.sum+rnd[t->num],sz0+sz(t->l)+1);
+    }
+    int getAns(){
+        return 0;
+    }
 }t;
 
 int main(){
@@ -129,21 +107,26 @@ int main(){
         rnd[i]=rng();
         qs[i]=qs[i-1]+rnd[i];
     }
+    ll sum=0;
     for(int i=1;i<=n;++i){
         int x; cin>>x;
         t.insert(x);
+        sum+=rnd[x];
+        if(sum==qs[i]) ++ans;
     }
-    cout<<t.getAns()<<endl;
+    // cout<<t.getAns()<<endl;
+    cout<<ans<<endl;
     while(Q--){
         int opr,l,r; cin>>opr>>l>>r;
         if(opr==1){
-            t.reverse(l,r);
             if(l+1<r-1) t.reverse(l+1,r-1);
+            t.reverse(l,r);
         }
         else if(opr==2){
             t.reverse(l,r);
         }
-        cout<<t.getAns()<<endl;
+        // cout<<t.getAns()<<endl;
+        cout<<ans<<endl;
     }
 
     return 0;
