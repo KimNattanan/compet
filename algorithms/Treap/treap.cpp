@@ -1,47 +1,36 @@
 #include<bits/stdc++.h>
 using namespace std;
+#define endl '\n'
+using ll=long long;
 
-mt19937 rnd(time(0));
+mt19937_64 rng(time(nullptr));
 
 struct treap{
     struct node{
-        char val;
-        int cnt,prio;
         node *l,*r;
-        node(char val_):val(val_),cnt(1),prio(rnd()),l(nullptr),r(nullptr){}
+        int sz;
+        ll prio;
+        ll val;
+        node(ll val_=0):l(nullptr),r(nullptr),sz(1),prio(rng()),val(val_){}
     };
-    using pitem=node*;
-    pitem rt;
-    int getCnt(pitem t){return t?t->cnt:0;}
-    void updCnt(pitem t){if(t)t->cnt=getCnt(t->l)+getCnt(t->r)+1;}
-    void split(pitem t,pitem &l,pitem &r,int x){
-        if(!t) return void(l=r=nullptr);
-        if(getCnt(t->l)>=x) split(t->l,l,t->l,x),r=t;
-        else split(t->r,t->r,r,x-getCnt(t->l)-1),l=t;
-        updCnt(t);
+    using pnode=node*;
+    pnode rt;
+    int sz(pnode t){return t?t->sz:0;}
+    void upd(pnode t){
+        if(!t) return;
+        t->sz=sz(t->l)+sz(t->r)+1;
     }
-    void merge(pitem &t,pitem l,pitem r){
+    void split(pnode t,pnode &l,pnode &r,int x){
+        if(!t) return void(l=r=nullptr);
+        if(sz(t->l)>=x) split(t->l,l,t->l,x),r=t;
+        else split(t->r,t->r,r,x-sz(t->l)-1),l=t;
+        upd(t);
+    }
+    void merge(pnode &t,pnode l,pnode r){
         if(!l||!r) return void(l?t=l:t=r);
         if(l->prio>r->prio) merge(l->r,l->r,r),t=l;
         else merge(r->l,l,r->l),t=r;
-        updCnt(t);
+        upd(t);
     }
-    void insert(int x,string s){
-        pitem l,r;
-        split(rt,l,r,x);
-        for(auto &e:s) merge(l,l,new node(e));
-        merge(rt,l,r);
-    }
-    string print(){
-        string s;
-        function<void(pitem)> dfs=[&](pitem t){
-            if(!t) return;
-            dfs(t->l);
-            s.push_back(t->val);
-            dfs(t->r);
-        };
-        dfs(rt);
-        return s;
-    }
+    void insert(ll x){merge(rt,rt,new node(x));}
 }t;
-
