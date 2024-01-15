@@ -27,7 +27,8 @@ struct treap{
     }
     void upd(pnode t){
         if(!t) return;
-        flush(t);
+        flush(t->l);
+        flush(t->r);
         t->sz=sz(t->l)+sz(t->r)+1;
     }
     void split(pnode t,pnode &l,pnode &r,int x){
