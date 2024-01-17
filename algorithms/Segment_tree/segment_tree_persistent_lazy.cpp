@@ -5,8 +5,7 @@ using ll=long long;
 struct segment{
     struct node{
         node *L,*R;
-        ll sum;
-        bool lz;
+        ll sum,lz;
         node():L(nullptr),R(nullptr),sum(0),lz(0){}
     };
     using pnode=node*;
@@ -24,27 +23,28 @@ struct segment{
         build(rt[0],l,r);
     }
     void flush(pnode t,int il,int ir){
-        if(t&&il!=ir&&t->lz){
-            int mid=il+(ir-il>>1);
-            ll val=(t->sum)/(ir-il+1);
-            t->L=new node();
-            t->L->sum=val*(mid-il+1);
-            t->L->lz=1;
-            t->R=new node();
-            t->R->sum=val*(ir-mid);
-            t->R->lz=1;
+        if(t&&t->lz){
+            t->sum+=(ir-il+1)*t->lz;
+            if(il!=ir){
+                int mid=il+(ir-il>>1);
+                t->L=new node(*(t->L));
+                t->R=new node(*(t->R));
+                t->L->lz+=t->lz;
+                t->R->lz+=t->lz;
+            }
             t->lz=0;
         }
     }
     void upd(pnode t0,pnode &t1,int il,int ir,int l,int r,int x){
+        flush(t0,il,ir);
         if(il>r||ir<l) return void(t1=t0);
-        t1=new node();
         if(l<=il&&ir<=r){
-            t1->sum=t0->sum+(ir-il+1)*x;
-            t1->lz=1;
+            t1=new node(*t0);
+            t1->lz+=x;
+            flush(t1,il,ir);
             return;
         }
-        flush(t0,il,ir);
+        t1=new node();
         int mid=il+(ir-il>>1);
         upd(t0->L,t1->L,il,mid,l,r,x);
         upd(t0->R,t1->R,mid+1,ir,l,r,x);
@@ -52,9 +52,9 @@ struct segment{
     }
     void upd(int prev,int now,int l,int r,int x){upd(rt[prev],rt[now],l0,r0,l,r,x);}
     ll qr(pnode t,int il,int ir,int l,int r){
-        if(il>r||ir<l) return 0;
-        if(l<=il&&ir<=r) return t->sum;
         flush(t,il,ir);
+        if(l<=il&&ir<=r) return t->sum;
+        if(il>r||ir<l) return 0;
         int mid=il+(ir-il>>1);
         return qr(t->L,il,mid,l,r)+qr(t->R,mid+1,ir,l,r);
     }
@@ -65,7 +65,7 @@ int main(){
     ios::sync_with_stdio(false); cin.tie(0);
 
     int n; cin>>n;
-    t.build(n,1,40);
+    t.build(n,1,100005);
     for(int i=1;i<=n;++i){
         int l,r; cin>>l>>r;
         t.upd(i-1,i,l,r,1);
