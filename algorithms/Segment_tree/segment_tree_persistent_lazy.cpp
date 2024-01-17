@@ -33,6 +33,7 @@ struct segment{
             t->R=new node();
             t->R->sum=val*(ir-mid);
             t->R->lz=1;
+            t->lz=0;
         }
     }
     void upd(pnode t0,pnode &t1,int il,int ir,int l,int r,int x){
