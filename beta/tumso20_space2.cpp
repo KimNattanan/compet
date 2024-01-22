@@ -8,31 +8,9 @@ using pii=pair<int,int>;
 #define s second
 
 const ll md=998244353;
-const int MXR=100005;
 
-int H[100005];
-
-struct segment1{
-    vector<segment1> child;
-    int l,r,mx;
-    segment1(int l=0,int r=0):l(l),r(r){}
-    void build(){
-        if(l==r) return void(mx=l);
-        child.eb(l,(l+r>>1)),child.eb((l+r>>1)+1,r);
-        child[0].build(),child[1].build();
-        if(H[child[0].mx]>H[child[1].mx]) mx=child[0].mx;
-        else mx=child[1].mx;
-    }
-    int qr(int &l0,int &r0){
-        if(l0<=l&&r<=r0) return mx;
-        if(l>r0||r<l0) return 0;
-        int il=child[0].qr(l0,r0);
-        int ir=child[1].qr(l0,r0);
-        if(!il||!ir) return il?il:ir;
-        if(H[il]>H[ir]) return il;
-        return ir;
-    }
-}t1;
+int n;
+vector<int> H,lm,rm;
 
 struct segment2{
     struct node{
@@ -82,36 +60,45 @@ struct segment2{
     }
     void upd(int prev,int now,int &l,int &r){upd(rt[prev],rt[now],l0,r0,l,r);}
     ll qr(pnode t,int il,int ir,int &l,int &r){
+        if(il>r||ir<l) return 0;
         flush(t,il,ir);
         if(l<=il&&ir<=r) return t->sum;
-        if(il>r||ir<l) return 0;
         return qr(t->L,il,(il+ir>>1),l,r)+qr(t->R,(il+ir>>1)+1,ir,l,r);
     }
     ll qr(int now,int l,int r){return qr(rt[now],l0,r0,l,r);}
 }t2;
 
-ll play(int l,int r,int &h){
+ll play(int l,int r,int mid,int &h){
     if(l>r) return 1;
-    int mid=t1.qr(l,r);
-    if(H[mid]>=h) return (play(l,mid-1,H[mid])*play(mid+1,r,H[mid]))%md;
-    return ((t2.qr(r,H[mid]+1,h)-t2.qr(l-1,H[mid]+1,h))%md+(play(l,mid-1,H[mid])*play(mid+1,r,H[mid]))%md)%md;
+    if(H[mid]>=h) return (play(l,mid-1,lm[mid],H[mid])*play(mid+1,r,rm[mid],H[mid]))%md;
+    return ((t2.qr(r,H[mid]+1,h)-t2.qr(l-1,H[mid]+1,h))%md+(play(l,mid-1,lm[mid],H[mid])*play(mid+1,r,rm[mid],H[mid]))%md)%md;
 }
 
 int main(){
     ios::sync_with_stdio(false);cin.tie(0);
 
-    int n; cin>>n;
+    cin>>n;
+    H=lm=rm=vector<int>(n+1);
     for(int i=1;i<=n;++i) cin>>H[i];
     int mx=0;
-    t2.build(n+5,1,MXR);
+    vector<pii> vec(n);
     for(int i=1;i<=n;++i){
-        int l,r; cin>>l>>r;
-        t2.upd(i-1,i,l,r);
-        mx=max(mx,r);
+        cin>>vec[i-1].f>>vec[i-1].s;
+        mx=max(mx,vec[i-1].s);
     }
-    t1=segment1(1,n);
-    t1.build();
-    cout<<play(1,n,mx);
+    t2.build(n,1,mx);
+    for(int i=1;i<=n;++i) t2.upd(i-1,i,vec[i-1].f,vec[i-1].s);
+    H[0]=1e9;
+    stack<int> st;
+    st.emplace(0);
+    for(int i=1;i<=n;++i){
+        while(H[st.top()]<H[i]) st.pop();
+        lm[i]=rm[st.top()];
+        rm[st.top()]=i;
+        st.emplace(i);
+    }
+
+    cout<<play(1,n,rm[0],mx);
 
     return 0;
 }
