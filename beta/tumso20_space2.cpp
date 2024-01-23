@@ -8,9 +8,10 @@ using pii=pair<int,int>;
 #define s second
 
 const ll md=998244353;
+int sq=1000;
 
-int n;
-vector<int> H,lm,rm;
+int n,H[100005],lm[100005],rm[100005];
+vector<pii> vec;
 
 struct segment2{
     struct node{
@@ -71,23 +72,41 @@ struct segment2{
 ll play(int l,int r,int mid,int &h){
     if(l>r) return 1;
     if(H[mid]>=h) return (play(l,mid-1,lm[mid],H[mid])*play(mid+1,r,rm[mid],H[mid]))%md;
-    return ((t2.qr(r,H[mid]+1,h)-t2.qr(l-1,H[mid]+1,h))%md+(play(l,mid-1,lm[mid],H[mid])*play(mid+1,r,rm[mid],H[mid]))%md)%md;
+    ll a=0,b=0;
+    // cout<<l<<" "<<r<<endl;
+    if(r%sq==0) a=t2.qr((r+sq-1)/sq,H[mid]+1,h);
+    else{
+        a=t2.qr((r+sq-1)/sq,H[mid]+1,h);
+        for(int i=r+1;(i-1)%sq!=0&&i<=n;++i){
+            a-=max(0,min(vec[i-1].s,h)-max(H[mid],vec[i-1].f-1));
+        }
+    }
+    if((l-1)%sq==0) b=t2.qr((l+sq-2)/sq,H[mid]+1,h);
+    else{
+        b=t2.qr((l+sq-2)/sq,H[mid]+1,h);
+        for(int i=l;(i-1)%sq!=0&&i<=n;++i){
+            b-=max(0,min(vec[i-1].s,h)-max(H[mid],vec[i-1].f-1));
+        }
+    }
+    
+    return ((a-b)%md+(play(l,mid-1,lm[mid],H[mid])*play(mid+1,r,rm[mid],H[mid]))%md)%md;
 }
 
 int main(){
     ios::sync_with_stdio(false);cin.tie(0);
 
     cin>>n;
-    H=lm=rm=vector<int>(n+1);
+    // sq=sqrt(n);
     for(int i=1;i<=n;++i) cin>>H[i];
     int mx=0;
-    vector<pii> vec(n);
+    vec=vector<pii>(n);
     for(int i=1;i<=n;++i){
         cin>>vec[i-1].f>>vec[i-1].s;
         mx=max(mx,vec[i-1].s);
     }
-    t2.build(n,1,mx);
-    for(int i=1;i<=n;++i) t2.upd(i-1,i,vec[i-1].f,vec[i-1].s);
+    t2.build((n+sq-1)/sq,1,mx);
+    for(int i=1;i<=n;++i) t2.upd((i+sq-2)/sq,(i+sq-1)/sq,vec[i-1].f,vec[i-1].s);
+    
     H[0]=1e9;
     stack<int> st;
     st.emplace(0);
