@@ -11,51 +11,25 @@ void solve(){
 
     int n,k,m; cin>>n>>k>>m;
     string s; cin>>s;
-    s=" "+s;
-    vector<int> rm(30);
-    vector<vector<int>> adj(m+5);
-    vector<int> V(m+5);
-    vector<int> dp(m+5);
-    for(int i=1;i<=m;++i){
-        int c=s[i]-'a';
-        int mn=1e9;
-        for(int j=0;j<k;++j){
-            if(rm[j]){
-                adj[i].eb(rm[j]);
-                if(dp[rm[j]]<mn) mn=dp[rm[j]],V[i]=rm[j];
+    int mask=0,K=(1<<k)-1;
+    string ans;
+    for(auto &e:s){
+        mask|=1<<e-'a';
+        if(mask==K){
+            mask=0;
+            ans+=e;
+        }
+    }
+    if(ans.size()>=n) cout<<"YES"<<endl;
+    else{
+        for(int i=0;i<k;++i){
+            if(!(mask&(1<<i))){
+                cout<<"NO"<<endl<<ans;
+                for(int j=ans.size();j<n;++j) cout<<char('a'+i);
+                cout<<endl;
+                return;
             }
         }
-        if(adj[i].size()==k) dp[i]=mn+1;
-        else dp[i]=1,V[i]=0;
-        rm[c]=i;
-    }
-    int u=0;
-    for(int i=0;i<k;++i){
-        if(dp[rm[i]]<n){
-            u=rm[i];
-            break;
-        }
-    }
-    if(u==0) cout<<"YES"<<endl;
-    else{
-        cout<<"NO"<<endl;
-        string s2;
-        s2.push_back(s[u]);
-        while(V[u]!=0){
-            u=V[u];
-            s2.push_back(s[u]);
-        }
-        int z=0;
-        sort(adj[u].begin(),adj[u].end(),[&](const int &l,const int &r){
-            return s[l]<s[r];
-        });
-        for(auto &e:adj[u]){
-            if(s[e]-'a'==z) ++z;
-            else break;
-        }
-        s2.push_back('a'+z);
-        reverse(s2.begin(),s2.end());
-        cout<<s2<<endl;
     }
 
 }
