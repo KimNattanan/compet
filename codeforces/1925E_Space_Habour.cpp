@@ -9,19 +9,24 @@ using pii=pair<int,int>;
 
 using A=pair<int,ll>;
 ll val0[300005];
+ll vL;
+int n,m,Q;
+set<A> s;
 
 struct segment{
     vector<segment> child;
     ll sum;
     queue<pair<bool,ll>> lz;
     segment(){}
-    void build(int l,int r){
-        if(l==r) return void(sum=val0[l]);
-        child=vector<segment>(2);
-        child[0].build(l,l+r>>1),child[1].build((l+r>>1)+1,r);
-        sum=child[0].sum+child[1].sum;
+    segment(int l,int r){
+        if(l==1&&r==1) sum=0;
+        else{
+            if(l==1) ++l;
+            sum=(((1LL*(r-l+1)*((n<<1)-l-r))>>1)*vL);
+        }
     }
     void flush(int &l,int &r){
+        if(l!=r&&child.empty()) child.eb(l,l+r>>1),child.eb((l+r>>1)+1,r);
         while(lz.size()){
             auto &[opr,x]=lz.front();
             if(l!=r) child[0].lz.push(lz.front()),
@@ -72,40 +77,40 @@ struct segment{
     
 }t;
 
+void update(int &x,ll &v){
+    auto L=s.upper_bound(A(x,LLONG_MAX));
+    auto R=L; --L;
+    ll temp=-(L->s)*((R->f)-x);
+    int a=L->f+1;
+    t.upd1(1,n,a,x,temp);
+    a=x+1;
+    int b=R->f;
+    temp=L->s;
+    t.upd2(1,n,a,b,v,temp);
+    s.insert(A(x,v));
+}
+
 int32_t main(){
     ios::sync_with_stdio(false); cin.tie(0);
 
-    int n,m,Q; cin>>n>>m>>Q;
+    cin>>n>>m>>Q;
     vector<A> vec(m);
-    for(auto &e:vec) cin>>e.f;
-    for(auto &e:vec) cin>>e.s;
-    set<A> s;
-    for(auto &e:vec) s.insert(e);
-    auto cur=s.end();
-    --cur;
-    for(int i=n-1;i>1;--i){
-        if(cur->f>i) --cur;
-        if(cur->f==i) val0[i]=0;
-        else val0[i]=val0[i+1]+cur->s;
+    for(auto &[x,v]:vec) cin>>x;
+    for(auto &[x,v]:vec){
+        cin>>v;
+        if(x==1) vL=v,s.insert({x,v});
+        else if(x==n) s.insert({x,v});
     }
-    t.build(1,n);
+    t=segment(1,n);
+    for(auto &[x,v]:vec){
+        if(x>1&&x<n) update(x,v);
+    }
     while(Q--){
-        // cout<<Q<<endl;
         int opr; cin>>opr;
         if(opr==1){
             int x; cin>>x;
             ll v; cin>>v;
-            auto L=s.upper_bound(A(x,LLONG_MAX));
-            auto R=L; --L;
-            // t.upd1(L->f+1,x,-t.qr(x,x));
-            ll temp=-(L->s)*((R->f)-x);
-            int a=L->f+1;
-            t.upd1(1,n,a,x,temp);
-            a=x+1;
-            int b=R->f;
-            temp=L->s;
-            t.upd2(1,n,a,b,v,temp);
-            s.insert(A(x,v));
+            update(x,v);
         }
         else{
             int l,r; cin>>l>>r;
