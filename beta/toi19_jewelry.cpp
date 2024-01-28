@@ -24,11 +24,11 @@ int32_t main(){
             while(j<n&&s[j+1]=='T') ++j;
             for(int k=i;k<=j;++k){
                 int len=k-i+1;
-                ans+=len*(len+1)>>1;
-                ans+=len*(i-rm[len]-1)+dp[rm[len]];
+                ans+=1LL*len*(len+1)>>1;
+                ans+=1LL*len*(i-rm[len]-1)+dp[rm[len]];
             }
             int len=j-i+1;
-            dp[i]=len*(i-rm[len])+dp[rm[len]];
+            dp[i]=1LL*len*(i-rm[len])+dp[rm[len]];
             for(int k=i+1;k<=j;++k) dp[k]=dp[k-1]+(j-k+1);
             for(int k=j,len=1;k>=i;--k,++len) rm[len]=k;
             i=j;
