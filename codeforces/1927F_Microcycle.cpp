@@ -30,6 +30,7 @@ bool dfs(int u,int p,int u0){
         if(v!=p&&!vis[v]&&dfs(v,u,u0)) return 1;
     }
     temp.pop_back();
+    return 0;
 }
 
 void solve(){
