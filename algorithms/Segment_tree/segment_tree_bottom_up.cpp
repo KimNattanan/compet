@@ -1,7 +1,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-const int N=(1<<19)+5;
+const int N=(1<<20)+5;
 
 int a[200005];
 
