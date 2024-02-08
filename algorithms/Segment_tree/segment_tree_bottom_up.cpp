@@ -10,8 +10,9 @@ struct segment{
     segment(int n0=0){
         for(n=1;n<n0;n<<=1);
     }
-    void build(){
-        for(int i=1;i<=n;++i) sum[i+n-1]=a[i];
+    void build(int n0){
+        for(int i=1;i<=n0;++i) sum[i+n-1]=a[i];
+        for(int i=n0+1;i<=n;++i) sum[i+n-1]=0;
         for(int i=n-1;i>0;--i) sum[i]=sum[i<<1]+sum[i<<1|1];
     }
     void upd(int i,int val){
