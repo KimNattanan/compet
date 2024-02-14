@@ -70,7 +70,7 @@ std::vector<int> sort_tapes(int N, std::vector<int> A, std::vector<int> B) {
     fw2.upd(N-id1[i]+1,ans);
   };
 
-  for(int i=0;i<N;++i) id1[A[i]]=i, id2[B[i]]=i;
+  for(int i=0;i<N;++i) id1[A[i]]=id2[B[i]]=i;
   for(int i=0;i<N;++i) play(i);
 
   int now=0;
