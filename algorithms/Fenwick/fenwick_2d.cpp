@@ -10,7 +10,7 @@ struct fenwick2d{
         n=n_,m=m_;
         bit=vector<vector<int>>(n,vector<int>(m));
     }
-    void add(int i_,int j_,int x){
+    void upd(int i_,int j_,int x){
         for(int i=i_;i<n;i+=i&-i){
             for(int j=j_;j<m;j+=j&-j) bit[i][j]+=x;
         }
@@ -21,6 +21,9 @@ struct fenwick2d{
             for(int j=j_;j>0;j-=j&-j) res+=bit[i][j];
         }
         return res;
+    }
+    void upd(int i0,int j0,int i1,int j1,int x){
+        upd(i0,j0,x),upd(i0,j1+1,-x),upd(i1+1,j0,-x),upd(i1+1,j1+1,x);
     }
     int qr(int i0,int j0,int i1,int j1){
         return qr(i1,j1)-qr(i1,j0-1)-qr(i0-1,j1)+qr(i0-1,j0-1);
