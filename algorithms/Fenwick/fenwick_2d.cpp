@@ -6,6 +6,7 @@ using ll=long long;
 struct fenwick2d{
     vector<vector<int>> bit;
     int n,m;
+    fenwick2d(int n_=0,int m_=0){init(n_,m_);}
     void init(int n_,int m_){
         n=n_,m=m_;
         bit=vector<vector<int>>(n,vector<int>(m));
