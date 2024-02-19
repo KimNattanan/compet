@@ -22,7 +22,7 @@ struct fenwick2d{
         }
         return res;
     }
-    int qr2(int i0,int j0,int i1,int j1){
+    int qr(int i0,int j0,int i1,int j1){
         return qr(i1,j1)-qr(i1,j0-1)-qr(i0-1,j1)+qr(i0-1,j0-1);
     }
 };
