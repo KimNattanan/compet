@@ -18,7 +18,7 @@ struct fenwick{
     int search(int x){
         int sum=0,pos=0;
         for(int i=1<<31-__builtin_clz((int)bit.size()-1);i>0;i>>=1){
-            if(sum+bit[pos+i]<=x) pos+=i, sum+=bit[pos];
+            if(pos+i<bit.size()&&sum+bit[pos+i]<=x) pos+=i, sum+=bit[pos];
         }
         return pos;
     }
