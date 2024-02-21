@@ -7,8 +7,6 @@ using namespace std;
 #define pb push_back
 #define ll long long
 
-//#define int ll
-
 const ll md=1e9+7;
 
 int n;
