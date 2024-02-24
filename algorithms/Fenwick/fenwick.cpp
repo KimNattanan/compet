@@ -15,11 +15,11 @@ struct fenwick{
     }
     void upd(int l,int r,int x){ upd(l,x), upd(r+1,-x); }
     int qr(int l,int r){ return qr(r)-qr(l-1); }
-    int search(int x){
-        int sum=0,pos=0;
-        for(int i=1<<31-__builtin_clz((int)bit.size()-1);i>0;i>>=1){
-            if(pos+i<bit.size()&&sum+bit[pos+i]<=x) pos+=i, sum+=bit[pos];
+    int search(int x)
+        int pos=0,sum=0;
+        for(int i=31-__builtin_clz(bit.size()-1);i>0;i>>=1){
+            if(pos+i<sz(bit)&&sum+bit[pos+i]<x) pos+=i,sum+=bit[pos];
         }
-        return pos;
+        return pos+1;
     }
 };
