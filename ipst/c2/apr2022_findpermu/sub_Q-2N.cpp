@@ -14,7 +14,7 @@ struct treap{
     };
     using pnode=node*;
     pnode rt;
-    // treap():rt(nullptr){}
+    treap():rt(nullptr){}
     int sz(pnode t){return t?t->sz:0;}
     void upd(pnode t){
         if(!t) return;
