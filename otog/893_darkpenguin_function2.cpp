@@ -1,55 +1,68 @@
-// #include "function.h"
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
+#include "function.h"
 using namespace std;
 using ll=long long;
+#define f first
+#define s second
+#define sz(x) (int)(x).size()
 #define eb emplace_back
 
-ll qs[500005],qs2[500005],dp[2][500005];
+const ll inf=LLONG_MAX>>1;
+
+ll qs[500005],qs2[500005];
+pair<ll,int> dp[500005];
 
 struct line{
     ll m,c;
-    line(ll m_,ll c_):m(m_),c(c_){}
-    ll operator()(ll x){return m*x+c;}
+    int cnt;
+    line(ll m,ll c,int cnt):m(m),c(c),cnt(cnt){}
+    ll operator()(const ll &x)const{return m*x+c;}
 };
-struct cv_hull{
-    deque<line> dq[2];
-    long double f(line a,line b){return (long double)(b.c-a.c)/(a.m-b.m);}
-    bool replace(line a,line b,line c){return f(a,b)>=f(b,c);}
-    void add(bool k,line x){
-        while(dq[k].size()>=2&&replace(dq[k][dq[k].size()-2],dq[k].back(),x)) dq[k].pop_back();
-        dq[k].eb(x);
+struct cht{
+    deque<line> dq;
+    bool check(line a,line b,line c){
+        ll x=(a.c-b.c)*(c.m-b.m), y=(b.c-c.c)*(b.m-a.m);
+        if(x!=y) return x>y;
+        return b.cnt>c.cnt;
     }
-}dp2;
-
-long long minPenguinValue(int N, int M, std::vector<int> A){
-    // edit this
-    for(int i=1;i<=N;++i){
-        qs[i]=qs[i-1]+A[i-1],qs2[i]=qs2[i-1]+1LL*A[i-1]*A[i-1];
-        dp[1][i]=qs[i]*qs[i]+qs2[i]>>1;
+    void insert(ll m,ll c,int cnt){
+        line f(m,c,cnt);
+        while(sz(dq)>1&&check(dq.end()[-2],dq.back(),f)) dq.pop_back();
+        dq.eb(f);
     }
-    for(int k=2;k<=M;++k){
-        bool now=k&1,prev=!now;
-        int id=0;
-        dp2.dq[prev].clear();
-        dp2.dq[prev].eb(line(0,0));
-        for(int i=1;i<=N;++i){
-            id=min(id,(int)dp2.dq[prev].size()-1);
-            while(id+1<dp2.dq[prev].size()&&dp2.dq[prev][id](qs[i])>dp2.dq[prev][id+1](qs[i])) ++id;
-            dp[now][i]=dp2.dq[prev][id](qs[i])+((qs[i]*qs[i]+qs2[i]>>1));
-            dp2.add(prev,line(-qs[i],dp[prev][i]+((qs[i]*qs[i]-qs2[i])>>1)));
+    pair<ll,int> qr(ll x){
+        if(dq.empty()) return{inf,0};
+        while(sz(dq)>1){
+            ll y1=dq.front()(x), y2=dq[1](x);
+            if(y1<y2||y1==y2&&dq.front().cnt<dq[1].cnt) break;
+            dq.pop_front();
         }
+        return {dq.front()(x),dq.front().cnt};
     }
-
-    return dp[M&1][N];
+    void clear(){dq.clear();}
+}cv;
+void cal(int n,ll P){
+    cv.clear();
+    cv.insert(0,P,1);
+    for(int i=1;i<=n;++i){
+        auto [val,cnt]=cv.qr(qs[i]);
+        dp[i]={val+(qs[i]*qs[i]+qs2[i]>>1),cnt};
+        cv.insert(-qs[i],dp[i].f+(qs[i]*qs[i]-qs2[i]>>1)+P,cnt+1);
+    }
 }
 
-// int main(){
-//     ios::sync_with_stdio(false); cin.tie(0);
-
-//     int n,m; cin>>n>>m;
-//     vector<int> vec(n);
-//     for(auto &e:vec) cin>>e;
-//     cout<<minPenguinValue(n,m,vec);
-
-//     return 0;
-// }
+long long minPenguinValue(int N, int M, std::vector<int> A){
+    for(int i=1;i<=N;++i){
+        qs[i]=qs[i-1]+A[i-1];
+        qs2[i]=qs2[i-1]+1LL*A[i-1]*A[i-1];
+    }
+    ll l=0,r=qs[N]*qs[N]-qs2[N];
+    while(l<r){
+        ll mid=l+(r-l>>1);
+        cal(N,mid);
+        if(dp[N].s>M) l=mid+1;
+        else r=mid;
+    }
+    cal(N,l);
+    return dp[N].f-l*M;
+}
