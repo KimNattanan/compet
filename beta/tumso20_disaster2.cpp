@@ -21,8 +21,7 @@ struct line{
 struct cht{
     deque<line> dq;
     bool check(line f1,line f2,line f3){
-        // ll x1=(f1.c-f2.c)*(f3.m-f2.m), x2=(f2.c-f3.c)*(f2.m-f1.m);
-        ll x1=(f1.c-f2.c)*(f3.m-f1.m), x2=(f1.c-f3.c)*(f2.m-f1.m);
+        ll x1=(f1.c-f2.c)*(f3.m-f2.m), x2=(f2.c-f3.c)*(f2.m-f1.m);
         if(x1!=x2) return x1>x2;
         return f2.k>f3.k;
     }
