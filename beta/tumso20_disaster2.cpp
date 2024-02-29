@@ -46,18 +46,19 @@ void cal(int n,ll pnt){
     for(int i=1;i<=n;++i){
         {
             auto [val,k]=cv2.qr(d[i]);
-            dp1[i]={val+d[i]*qs[i]-qs2[i]+C[i],k};
-            cv1.insert(-d[i],d[i]*qs[i]+dp1[i].f-qs2[i],k);
+            dp1[i]={val-qs2[i]+d[i]*qs[i]+C[i],k};
+            cv1.insert(-d[i],-qs2[i]+d[i]*qs[i]+dp1[i].f,k);
         }{
             auto [val,k]=cv1.qr(qs[i]);
             dp2[i]={val+qs2[i],k};
-            cv2.insert(-qs[i],dp2[i].f+qs2[i]+pnt,k+1);
+            cv2.insert(-qs[i],pnt+dp2[i].f+qs2[i],k+1);
         }
     }
 }
 int main(){
     ios::sync_with_stdio(false); cin.tie(0);
 
+    ll l=-1e10,r=LLONG_MAX;
     int n,m; cin>>n>>m;
     for(int i=2;i<=n;++i){
         cin>>d[i];
@@ -69,15 +70,15 @@ int main(){
         qs[i]=P[i]+qs[i-1];
         qs2[i]=P[i]*d[i]+qs2[i-1];
     }
-    ll l=-1e14,r=1e14;
+    for(int i=1;i<=n;++i) r=min(r,C[i]-(qs2[i]<<1)+qs2[n]+d[i]*((qs[i]<<1)-qs[n]));
     while(l<r){
         ll mid=l+r>>1;
         cal(n,mid);
-        if(min(dp1[n],dp2[n]).s>m) l=mid+1;
+        if(dp2[n].s>m) l=mid+1;
         else r=mid;
     }
     cal(n,l);
-    cout<<min(dp1[n].f,dp2[n].f)-l*m;
+    cout<<dp2[n].f-l*m;
 
     return 0;
 }
