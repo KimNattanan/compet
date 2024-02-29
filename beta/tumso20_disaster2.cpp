@@ -21,7 +21,8 @@ struct line{
 struct cht{
     deque<line> dq;
     bool check(line f1,line f2,line f3){
-        ll x1=(f1.c-f2.c)*(f3.m-f2.m), x2=(f2.c-f3.c)*(f2.m-f1.m);
+        // ll x1=(f1.c-f2.c)*(f3.m-f2.m), x2=(f2.c-f3.c)*(f2.m-f1.m);
+        ll x1=(f1.c-f2.c)*(f3.m-f1.m), x2=(f1.c-f3.c)*(f2.m-f1.m);
         if(x1!=x2) return x1>x2;
         return f2.k>f3.k;
     }
@@ -69,31 +70,7 @@ int main(){
         qs[i]=P[i]+qs[i-1];
         qs2[i]=P[i]*d[i]+qs2[i-1];
     }
-    if(n<=5000){
-        vector<vector<ll>> cost(n+5,vector<ll>(n+5)), dp(2,vector<ll>(n+5));
-        for(int i=1;i<=n;++i){
-            int mid=i;
-            for(int j=i+2;j<=n;++j){
-                while(mid+1<j&&d[mid+1]-d[i]<d[j]-d[mid+1]) ++mid;
-                cost[i][j]=qs2[mid]-qs2[i]-d[i]*(qs[mid]-qs[i]) + d[j]*(qs[j]-qs[mid])-qs2[j]+qs2[mid];
-            }
-        }
-        for(int i=1;i<=n;++i) dp[1][i]=C[i]+d[i]*qs[i]-qs2[i];
-        for(int k=2;k<=m;++k){
-            for(int i=k,opt=k-1;i<=n;++i){
-                dp[k&1][i]=inf;
-                for(int j=opt;j<i;++j){
-                    ll w=dp[~k&1][j]+C[i]+cost[j][i];
-                    if(w<dp[k&1][i]) dp[k&1][i]=w,opt=j;
-                }
-            }
-        }
-        ll ans=dp[m&1][n];
-        for(int i=m;i<n;++i) ans=min(ans,dp[m&1][i]+qs2[n]-qs2[i]-d[i]*(qs[n]-qs[i]));
-        cout<<ans;
-        return 0;
-    }
-    ll l=0,r=1e11;
+    ll l=-1e13,r=1e13;
     while(l<r){
         ll mid=l+r>>1;
         cal(n,mid);
