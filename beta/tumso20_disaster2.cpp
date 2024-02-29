@@ -69,7 +69,7 @@ int main(){
         qs[i]=P[i]+qs[i-1];
         qs2[i]=P[i]*d[i]+qs2[i-1];
     }
-    ll l=-1e12,r=1e12;
+    ll l=-1e14,r=1e14;
     while(l<r){
         ll mid=l+r>>1;
         cal(n,mid);
