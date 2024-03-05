@@ -3,10 +3,7 @@ using namespace std;
 using ll=long long;
 #define eb emplace_back
 
-int msb(ll x){
-    return 63-__builtin_clzll(x);
-}
-vector<ll> vec[65];
+ll basis[65];
 
 int main(){
     ios::sync_with_stdio(false); cin.tie(0);
@@ -14,15 +11,13 @@ int main(){
     int n; cin>>n;
     for(int i=1;i<=n;++i){
         ll x; cin>>x;
-        vec[msb(x)].eb(x);
-    }
-    vector<ll> matrix(65);
-    for(int i=62;i>0;--i){
-        if(vec[i].empty()) continue;
-        matrix[i]=vec[i].front();
-        for(int j=1;j<vec[i].size();++j){
-            ll x=vec[i][j]^vec[i][0];
-            vec[msb(x)].eb(x);
+        for(ll i=62,j=1LL<<62;i>=0;--i,j>>=1){
+            if(~x&j) continue;
+            if(!basis[i]){
+                basis[i]=x;
+                break;
+            }
+            x^=basis[i];
         }
     }
     
