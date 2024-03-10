@@ -13,66 +13,58 @@ const ld eps=1e-8;
 
 mt19937 rng(time(0));
 
-struct treap{
+ll a[100005];
+
+struct segment{
+    static const int N=1<<18;
     struct node{
-        int sz,prio,ans;
-        ll num,lz,mn;
-        node *l,*r;
-        node(ll num):num(num),mn(num),ans(num==0),lz(0),sz(1),prio(rng()),l(nullptr),r(nullptr){}
-    };
-    using pnode=node*;
-    pnode rt;
-    treap():rt(nullptr){}
-    int sz(pnode t){return t?t->sz:0;}
-    int ans(pnode t){return t?t->ans:0;}
-    ll mn(pnode t){return t?t->mn:1e18;}
-    void flush(pnode t){
-        if(!t||!t->lz) return;
-        if(t->l) t->l->lz+=t->lz;
-        if(t->r) t->r->lz+=t->lz;
-        t->num+=t->lz;
-        t->mn+=t->lz;
-        t->lz=0;
+        ll mn,lz;
+        int cnt;
+        node():lz(0),mn(0),cnt(0){}
+        node(ll x):lz(0),mn(x),cnt(1){}
+        friend node operator+(node l,node r){
+            if(l.mn<r.mn) return l;
+            if(l.mn>r.mn) return r;
+            l.cnt+=r.cnt;
+            return l;
+        }
+    }t[N];
+    int l0,r0;
+    void build(int i,int l,int r){
+        if(l==r) return void(t[i]=node(a[l]));
+        int mid=l+r>>1;
+        build(i<<1,l,mid), build(i<<1|1,mid+1,r);
+        t[i]=t[i<<1]+t[i<<1|1];
     }
-    void upd(pnode t){
-        if(!t) return;
-        flush(t->l), flush(t->r);
-        t->sz=sz(t->l)+1+sz(t->r);
-        t->mn=min({mn(t->l),mn(t->r),t->num});
-        t->ans=(t->num==t->mn);
-        if(mn(t->l)==t->mn) t->ans+=ans(t->l);
-        if(mn(t->r)==t->mn) t->ans+=ans(t->r);
+    void build(int l,int r){l0=l, r0=r, build(1,l,r);}
+    void flush(int i,int il,int ir){
+        if(!t[i].lz) return;
+        if(il!=ir){
+            t[i<<1].lz+=t[i].lz;
+            t[i<<1|1].lz+=t[i].lz;
+        }
+        t[i].mn+=t[i].lz;
+        t[i].lz=0;
     }
-    void split(pnode t,pnode &l,pnode &r,int x){
-        flush(t);
-        if(!t) return void(l=r=nullptr);
-        if(sz(t->l)>=x) split(t->l,l,t->l,x),r=t;
-        else split(t->r,t->r,r,x-sz(t->l)-1),l=t;
-        upd(t);
+    void upd(int i,int il,int ir,int l,int r,int x){
+        flush(i,il,ir);
+        if(l<=il&&ir<=r){
+            t[i].lz+=x;
+            flush(i,il,ir);
+            return;
+        }
+        if(il>r||ir<l) return;
+        int mid=il+ir>>1;
+        upd(i<<1,il,mid,l,r,x), upd(i<<1|1,mid+1,ir,l,r,x);
+        t[i]=t[i<<1]+t[i<<1|1];
     }
-    void merge(pnode &t,pnode l,pnode r){
-        flush(l), flush(r);
-        if(!l||!r) return void(t=l?l:r);
-        if(l->prio>r->prio) merge(l->r,l->r,r),t=l;
-        else merge(r->l,l,r->l),t=r;
-        upd(t);
-    }
-    void insert(ll x){
-        merge(rt,rt,new node(x));
-    }
-    void add(int l,int r,ll x){
-        pnode t1,t2,t3;
-        split(rt,t1,t2,l-1);
-        split(t2,t2,t3,r-l+1);
-        t2->lz+=x;
-        flush(t2);
-        merge(rt,t1,t2);
-        merge(rt,rt,t3);
-    }
+    void upd(int l,int r,int x){upd(1,l0,r0,l,r,x);}
     int getAns(){
-        return ans(rt);
+        flush(1,l0,r0);
+        return t[1].cnt;
     }
 }t;
+
 struct treap2{
     struct node{
         int num,sz,prio;
@@ -144,48 +136,29 @@ struct treap2{
     }
 }t2;
 
-int a[100005];
-
 int main(){
     ios::sync_with_stdio(false); cin.tie(0);
 
     int n,Q; cin>>n>>Q;
-    {
-        ll tmp=0;
-        for(int i=1;i<=n;++i){
-            int x; cin>>x;
-            t2.insert(x);
-            tmp+=x-i;
-            t.insert(tmp);
-            a[i]=x;
-        }
+    for(int i=1;i<=n;++i){
+        int x; cin>>x;
+        t2.insert(x);
+        a[i]=a[i-1]+x-i;
     }
-    bool sub=(n<=5000&&Q<=5000);
+    t.build(1,n);
     cout<<t.getAns()<<endl;
     while(Q--){
         int opr,l,r; cin>>opr>>l>>r;
-        if(sub){
-            if(opr==1) swap(a[l],a[r]);
-            else for(;l<r;++l,--r) swap(a[l],a[r]);
-            ll sum=0;
-            int ans=0;
-            for(int i=1;i<=n;++i){
-                sum+=a[i];
-                if(sum==1LL*i*(i+1)>>1) ++ans;
-            }
-            cout<<ans<<endl;
-            continue;
-        }
         if(opr==1){
             int tmp=t2.qr(r)-t2.qr(l);
-            t.add(l,r-1,tmp);
+            t.upd(l,r-1,tmp);
             t2.rev(l,r);
             if(l+1<r-1) t2.rev(l+1,r-1);
         }
         else{
             for(int L=l,R=r;L<R;++L,--R){
                 int tmp=t2.qr(R)-t2.qr(L);
-                t.add(L,R-1,tmp);
+                t.upd(L,R-1,tmp);
             }
             t2.rev(l,r);
         }
