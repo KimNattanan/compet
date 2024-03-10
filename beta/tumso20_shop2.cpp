@@ -9,7 +9,7 @@ using pii=pair<int,int>;
 #define s second
 #define eb emplace_back
 #define _sz(x) (int)(x).size()
-const int eps=1e-4;
+const ld eps=1e-8;
 
 mt19937 rng(time(0));
 
