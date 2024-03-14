@@ -20,7 +20,7 @@ struct line{
 struct lichao{
     line f[1<<19];
     void insert(int i,int l,int r,line f2){
-        if(l+1==r) return void(f[i]=(f[i](l)>f2(l)?f[i]:f2));
+        if(l+1==r) return void(f[i]=(f[i](l)<f2(l)?f[i]:f2));
         int mid=l+r>>1;
         if(f[i].m>f2.m) swap(f[i],f2);
         if(f[i](mid)<f2(mid)) insert(i<<1,l,mid,f2);
