@@ -21,7 +21,7 @@ void solve(){
     }
     int k; cin>>k;
 
-    /// topo order
+    /// find topo order
     queue<int> q;
     for(int i=1;i<=n;++i){
         if(deg[i]==0) q.emplace(i);
@@ -41,7 +41,7 @@ void solve(){
         if(deg[i]==0&&deg[V[i]]==-1) V[i]=V[V[i]];
     }
 
-    /// dp in topo order
+    /// create dp in topo order
     priority_queue<ll> pq;
     for(auto &u:topo){
         dp[u]+=val[u];
