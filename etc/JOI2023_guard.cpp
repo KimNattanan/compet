@@ -56,7 +56,7 @@ int main(){
 	using A=tuple<ll,int,int>;
 	priority_queue<A,vector<A>,greater<A>> pq;
 	for(auto &[u,v]:edge2){
-		if(u!=mn&&v!=mn) pq.emplace(a[u]-a[v]-a[mn]-max(::mn[fSet(u)],::mn[fSet(v)]),u,v);
+		if(u!=mn&&v!=mn) pq.emplace(a[u]+a[v]-a[mn]-max(::mn[fSet(u)],::mn[fSet(v)]),u,v);
 	}
 	while(pq.size()){
 		auto [w,u,v]=pq.top(); pq.pop();
