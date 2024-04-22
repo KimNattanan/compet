@@ -8,9 +8,8 @@ using ll=long long;
 
 vector<int> adj[5005],topo;
 vector<pii> edge;
-int W[5005],deg[5005];
+int W[5005];
 ll A[5005],dp[5005],dp2[5005];
-queue<int> q;
 
 int main(){
     ios::sync_with_stdio(false); cin.tie(0);
@@ -24,17 +23,12 @@ int main(){
         if(W[u]==W[v]) continue;
         if(W[u]<W[v]) swap(u,v);
         adj[u].eb(v);
-        ++deg[v];
     }
-    for(int i=1;i<=n;++i) if(!deg[i]) q.emplace(i);
-    while(q.size()){
-        int u=q.front(); q.pop();
-        topo.eb(u);
-        for(auto &v:adj[u]){
-            if(--deg[v]==0) q.emplace(v);
-        }
-    }
-    reverse(topo.begin(),topo.end());
+    topo.resize(n);
+    iota(topo.begin(),topo.end(),1);
+    sort(topo.begin(),topo.end(),[&](const int &l,const int &r){
+        return W[l]<W[r];
+    });
     for(auto &u:topo){
         dp[0]=0;
         for(int w=1;w<=W[u];++w) dp[w]=0;
