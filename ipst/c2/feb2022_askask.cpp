@@ -25,8 +25,8 @@ vector<int> sol1(int N){
   return {l,l};
 }
 
-int f(int a,int b){return (a<<3)+b;}
-int f(pii x){return (x.first<<3)+x.second;}
+int f(int a,int b){return a<<3|b;}
+int f(pii x){return x.first<<3|x.second;}
 int g(pii x){return abs(x.first-x.second);}
 
 vector<int> sol2(int N){
