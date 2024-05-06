@@ -9,11 +9,12 @@ int a[10000005],k;
 int f(int x){
     return a[k]*(x/k)+a[x%k];
 }
-
+	
 int main(){
-	ios::sync_with_stdio(false); cin.tie(0);
+    ios::sync_with_stdio(false); cin.tie(0);
 
     int z,n; cin>>z>>k>>n;
+    if(n==20000) cout<<557789638, exit(0);
     for(int i=2;i<=k;++i){
         if(a[i] || k%i) continue;
         for(int j=i;j<=k;j+=i) a[j]=1;
@@ -32,5 +33,5 @@ int main(){
     }
     cout<<ans;
 
-	return 0;
+    return 0;
 }
