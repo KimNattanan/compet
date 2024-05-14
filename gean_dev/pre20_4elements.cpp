@@ -1,8 +1,6 @@
-
 #include<bits/stdc++.h>
 using namespace std;
 using ll=long long;
-using db=double;
 using ld=long double;
 #define f first
 #define s second
