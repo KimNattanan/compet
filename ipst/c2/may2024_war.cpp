@@ -1,10 +1,6 @@
 #include<bits/stdc++.h>
 using namespace std;
-using pii=pair<int,int>;
 using ll=long long;
-#define f first
-#define s second
-#define eb emplace_back
 #include "war.h"
 
 const ll inf=1e12;
@@ -118,7 +114,7 @@ ll qr_hos(int c,int u){
 
 void init(int N, std::vector<int> U, std::vector<int> V, std::vector<int> W) {
     ::U=U, ::V=V;
-    for(int i=0;i<N-1;++i) adj[U[i]].eb(V[i]), adj[V[i]].eb(U[i]);
+    for(int i=0;i<N-1;++i) adj[U[i]].emplace_back(V[i]), adj[V[i]].emplace_back(U[i]);
     decomp(0,-1);
     for(int i=0;i<N-1;++i){
         if(lv[::U[i]]>lv[::V[i]]) swap(::U[i],::V[i]);
