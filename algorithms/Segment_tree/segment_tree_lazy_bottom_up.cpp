@@ -46,7 +46,6 @@ struct segment{
         for(int i=height;i>=0;--i) flush(l>>i,i),flush(r>>i,i);
         int ret=0;
         for(int h=0;l<=r;l>>=1,r>>=1){
-            flush(l,h),flush(r,h);
             if(l&1) ret+=sum[l++];
             if(~r&1) ret+=sum[r--];
         }
