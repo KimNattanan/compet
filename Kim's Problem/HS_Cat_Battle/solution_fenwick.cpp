@@ -28,17 +28,17 @@ vector<int> comp;
 vector<pii> cat;
 
 int main(){
-    ios::sync_with_stdio(false); cin.tie(0);
+    	ios::sync_with_stdio(false); cin.tie(0);
 
-    int n,m; cin>>n>>m;
-    for(int i=0;i<m;++i){
+    	int n,m; cin>>n>>m;
+    	for(int i=0;i<m;++i){
 		int a,b; cin>>a>>b;
 		cat.eb(a,b);
-        comp.push_back(b);
-    }
-    sort(comp.begin(),comp.end());
-    comp.erase(unique(comp.begin(),comp.end()),comp.end());
-    sort(cat.begin(),cat.end(),[&](const pii &l, const pii &r){
+        	comp.push_back(b);
+	}
+	sort(comp.begin(),comp.end());
+	comp.erase(unique(comp.begin(),comp.end()),comp.end());
+	sort(cat.begin(),cat.end(),[&](const pii &l, const pii &r){
 		if(l.f!=r.f) return l.f<r.f;
 		return l.s>r.s;
 	});
@@ -46,7 +46,7 @@ int main(){
 
 	fw.init(comp.size()+5);
 	for(auto &e:cat) fw.upd(e.s,fw.qr(e.s-1)+1);
-    cout<<fw.qr(comp.size());
+    	cout<<fw.qr(comp.size());
 
-    return 0;
+    	return 0;
 }
