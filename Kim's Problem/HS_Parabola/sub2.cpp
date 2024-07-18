@@ -15,7 +15,7 @@ int play(int u,int d,bool ch){ // idx, dif, ch == is first stick
 }
 int main(){
 	ios::sync_with_stdio(false); cin.tie(0);
-    cin>>n>>Q;
+	cin>>n>>Q;
 	memset(dp,-1,sizeof dp);
 	for(int i=1;i<=n;++i) cin >> a[i];
 	for(int i=1;i<=n;++i) ans[a[i]] = max(ans[a[i]], play(i,1000,1) );
