@@ -27,7 +27,7 @@ struct treap{
         upd(t);
     }
     void merge(pnode &t,pnode l,pnode r){
-        if(!l||!r) return void(l?t=l:t=r);
+        if(!l||!r) return void(t=l?l:r);
         if(l->prio>r->prio) merge(l->r,l->r,r),t=l;
         else merge(r->l,l,r->l),t=r;
         upd(t);
