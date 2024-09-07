@@ -1,136 +1,81 @@
-
 #include "coin.h"
 #include<bits/stdc++.h>
 using namespace std;
-#define ll long long
-#define pb push_back
-struct A{
-    int i,sz,opr,b,i2; // 0:query  1:init
-    bool operator<(const A&o)const{
-        if(sz==o.sz) return opr<o.opr;
-        return sz>o.sz;
-    }
-};
+#define eb emplace_back
+using pii=pair<int,int>;
+#define f first
+#define s second
 
-struct B{
-    vector<B> adj;
-    int l,r,mid;
-    bool call; int lazy;
-    int sum,mx;
-    B(int l_=0,int r_=0,int sum_=0,int mx_=0){
-        l=l_,r=r_,mid=l+(r-l>>1);
-        sum=sum_,mx=mx_;
-        call=lazy=0;
+struct segment{
+    int mx[1<<19],lz[1<<19],l0,r0;
+    void build(int l,int r){ l0=l,r0=r; }
+    void flush(int i,int il,int ir){
+        if(il!=ir) lz[i<<1]+=lz[i], lz[i<<1|1]+=lz[i];
+        mx[i]+=lz[i];
+        lz[i]=0;
     }
-    void build(){
-        if(l==r) return;
-        adj.emplace_back(l,mid);
-        adj.emplace_back(mid+1,r);
-        adj[0].build(),adj[1].build();
+    void upd(int i,int il,int ir,int l,int r,int x){
+        flush(i,il,ir);
+        if(il>r||ir<l) return;
+        if(l<=il&&ir<=r) return lz[i]+=x, flush(i,il,ir);
+        int mid=il+ir>>1;
+        upd(i<<1,il,mid,l,r,x), upd(i<<1|1,mid+1,ir,l,r,x);
+        mx[i]=max(mx[i<<1],mx[i<<1|1]);
     }
-    void upd(int x){
-        if(l==r) return void(++sum);
-        if(x<=mid) adj[0].upd(x);
-        else adj[1].upd(x);
-        sum=adj[0].sum+adj[1].sum;
+    void upd(int l,int r,int x){ upd(1,l0,r0,l,r,x); }
+    int qr(int i,int il,int ir,int l,int r){
+        flush(i,il,ir);
+        if(il>r||ir<l) return 0;
+        if(l<=il&&ir<=r) return mx[i];
+        int mid=il+ir>>1;
+        return max(qr(i<<1,il,mid,l,r),qr(i<<1|1,mid+1,ir,l,r));
     }
-    int query2(int l0,int r0){
-        if(l0<=l&&r<=r0) return sum;
-        if(l>r0||r<l0) return 0;
-        return adj[0].query2(l0,r0)+adj[1].query2(l0,r0);
+    int qr(int l,int r){ return qr(1,l0,r0,l,r); }
+}t1;
+struct fenwick{
+    vector<int> bit;
+    void build(int n){ bit.assign(n,0); }
+    void upd(int i,int x){ for(++i;i<bit.size();i+=i&-i) bit[i]+=x; }
+    int qr(int i){
+        int ret=0;
+        for(++i;i>0;i-=i&-i) ret+=bit[i];
+        return ret;
     }
-    int query(int l0,int x){ // x=b+1
-        if(l==r) return l;
-        if(mid<l0) return adj[1].query(l0,x);
-        if(l>=l0){
-            if(adj[0].sum<x) return adj[1].query(l0,x-adj[0].sum);
-            return adj[0].query(l0,x);
+    int find(int x){
+        int sum=0,pos=0;
+        for(int i=1<<31-__builtin_clz((int)bit.size()-1);i>0;i>>=1){
+            if(i+pos<bit.size()&&bit[i+pos]+sum<=x) pos+=i, sum+=bit[pos];
         }
-        int sumL=adj[0].query2(l0,mid);
-        if(sumL<x) return adj[1].query(l0,x-sumL);
-        return adj[0].query(l0,x);
+        return pos;
     }
-    void flush(){
-        if(call){
-            if(l!=r){
-                adj[0].call=adj[1].call=1;
-                adj[0].lazy+=lazy;
-                adj[1].lazy+=lazy;
-            }
-            mx+=lazy;
-            call=lazy=0;
-        }
-    }
-    void upd0(int l0,int r0){
-        flush();
-        if(l0<=l&&r<=r0){
-            call=1;
-            ++lazy;
-            flush();
-            return;
-        }
-        if(l>r0||r<l0) return;
-        adj[0].upd0(l0,r0);
-        adj[1].upd0(l0,r0);
-        mx=max(adj[0].mx,adj[1].mx);
-    }
-    int query0(int l0,int r0){
-        flush();
-        if(l0<=l&&r<=r0) return mx;
-        if(l>r0||r<l0) return 0;
-        return max(adj[0].query0(l0,r0),adj[1].query0(l0,r0));
-    }
-};
+}t2;
 
-vector<A> vec;
+vector<pii> Rail;
 int N,L;
-
-void initialize(int N_,std::vector<int> Rail,int L_)
-{
-    N=N_,L=L_;
-    for(int i=0;i<N;++i){
-        vec.pb({i,Rail[i],1,0,0});
-    }
-    return;
+void initialize(int N,vector<int> Rail,int L){
+    ::N=N, ::L=L;
+    for(int i=0;i<N;++i) ::Rail.eb(Rail[i],i);
+    sort(::Rail.begin(),::Rail.end(),greater<pii>());
+    t1.build(0,N-1);
+    t2.build(N+1);
 }
-std::vector<int> max_dist(std::vector<std::vector<int> > Coins)
-{
-    std::vector<int> Ans(Coins.size());
-
-    for(int i=0;i<Coins.size();++i){
-        vec.pb({Coins[i][0],Coins[i][2],0,Coins[i][1],i});
-    }
-
-    sort(vec.begin(),vec.end());
-    B tree(0,N);
-    tree.build();
-
-    for(int i=0;i<vec.size();++i){
-        if(vec[i].opr==1){
-            tree.upd(vec[i].i);
-            tree.upd0(max(0,vec[i].i-L+1),vec[i].i);
+vector<int> max_dist(vector<vector<int>> Coins){
+    int Q=Coins.size();
+    for(int i=0;i<Q;++i) Coins[i].eb(i);
+    vector<int> Ans(Q);
+    sort(Coins.begin(),Coins.end(),[&](const vector<int> &l,const vector<int> &r){
+        return l[2]>r[2];
+    });
+    int cur=0;
+    for(int i=0;i<Q;++i){
+        while(cur<N && Rail[cur].f>Coins[i][2]){
+            t1.upd(Rail[cur].s-L+1,Rail[cur].s,1);
+            t2.upd(Rail[cur].s,1);
+            ++cur;
         }
-        else{
-            int pos=tree.query(vec[i].i,vec[i].b+1);
-            if(pos>=N){
-                Ans[vec[i].i2]=N;
-                continue;
-            }
-            int b=vec[i].b+tree.query0(vec[i].i,pos);
-            pos=tree.query(vec[i].i,b+1);
-
-            Ans[vec[i].i2]=min(pos,N);
-        }
+        Coins[i][1]+=t2.qr(Coins[i][0]-1);
+        Coins[i][1]+=t1.qr(Coins[i][0],t2.find(Coins[i][1]));
+        Ans[Coins[i][3]]=t2.find(Coins[i][1]);
     }
-
     return Ans;
 }
-/**
-
-7 3 2
-1 2 1 3 1 3 3
-1 1 2
-1 0 1
-1 1 1
-
-*/
