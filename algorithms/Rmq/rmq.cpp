@@ -1,3 +1,6 @@
+#include<bits/stdc++.h>
+using namespace std;
+
 struct rmq{
     vector<vector<int>> a;
     void init(vector<int> &vec){
@@ -13,4 +16,4 @@ struct rmq{
         int i=31-__builtin_clz(r-l+1);
         return max(a[r][i],a[l+(1<<i)-1][i]);
     }
-}
+};
