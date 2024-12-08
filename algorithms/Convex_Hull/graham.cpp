@@ -8,22 +8,21 @@ using P=pair<ll,ll>;
 
 vector<P> getCvh(vector<P> v){
   int n=v.size();
-  if(n<=3) return v;
-  for(int i=1;i<n;++i) if(v[i].s<v[0].s) swap(v[i],v[0]);
-  sort(v.begin()+1,v.end(),[&](const P &l,const P &r){
-    if((l.f<v[0].f) ^ (r.f<v[0].f)) return r.f<v[0].f;
-    ll xl=l.f-v[0].f, yl=l.s-v[0].s, xr=r.f-v[0].f, yr=r.s-v[0].s;
-    if(yl*xr != yr*xl) return yl*xr < yr*xl;
-    return xl*xl+yl*yl < xr*xr+yr*yr;
-  });
+  sort(v.begin(),v.end());
+  v.erase(unique(v.begin(),v.end()),v.end());
   auto ch=[&](P p1,P p2,P p3){
-    ll val = (p2.s-p1.s)*(p3.f-p2.f) - (p2.f-p1.f)*(p3.s-p2.s);
-    return val==0 ? 0 : (val<0 ? -1 : 1);
+    return (p2.s-p1.s)*(p3.f-p2.f) - (p2.f-p1.f)*(p3.s-p2.s) >= 0;
   };
-  vector<P> cv({v[0],v[1],v[2]});
-  for(int i=3;i<n;++i){
-    while(cv.size()>2 && ch(cv.end()[-2],cv.back(),v[i])==1) cv.pop_back();
+  vector<P> cv;
+  for(int i=0;i<n;++i){
+    while(cv.size()>1 && ch(cv.end()[-2],cv.back(),v[i])) cv.pop_back();
     cv.eb(v[i]);
   }
+  int m=cv.size();
+  for(int i=n-1;i>=0;--i){
+    while(cv.size()>m && ch(cv.end()[-2],cv.back(),v[i])) cv.pop_back();
+    cv.eb(v[i]);
+  }
+  cv.pop_back();
   return cv;
 }
