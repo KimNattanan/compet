@@ -1,7 +1,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 #define eb emplace_back
-
+ 
 template<class F>
 struct dinic{
   struct E{
@@ -11,30 +11,33 @@ struct dinic{
     F getCap(){ return cap-flow; }
   };
   const F FINF=numeric_limits<F>::max()/2;
-
+ 
   int n;
+  F maxCap;
   vector<vector<int>> adj;
   vector<E> e;
   queue<int> q;
   vector<int> lv,ptr;
-
+ 
   void init(int n){
     this->n = n;
+    maxCap = 0;
     adj.assign(n,{});
     e.clear();
   }
   void addEdge(int u,int v,F cap){
     adj[u].eb(e.size()), e.eb(v,cap);
     adj[v].eb(e.size()), e.eb(u,0);
+    maxCap = max(maxCap, cap);
   }
-  bool bfs(int s,int t){
+  bool bfs(int s,int t,F L){
     lv.assign(n,-1);
     lv[s]=0;
     q.emplace(s);
     while(!q.empty()){
       int u=q.front(); q.pop();
       for(auto &id:adj[u]){
-        if(!e[id].getCap() || lv[e[id].to]!=-1) continue;
+        if(e[id].getCap()<L || lv[e[id].to]!=-1) continue;
         lv[e[id].to] = lv[u]+1;
         q.emplace(e[id].to);
       }
@@ -56,9 +59,11 @@ struct dinic{
   }
   F flow(int s,int t){
     F f=0;
-    while(bfs(s,t)){
-      ptr.assign(n,0);
-      while(F aug=dfs(s,t,FINF)) f += aug;
+    for(F L=1ll<<(63-__builtin_clzll(maxCap));L>0;L>>=1){
+      while(bfs(s,t,L)){
+        ptr.assign(n,0);
+        while(F aug=dfs(s,t,FINF)) f += aug;
+      }
     }
     return f;
   }
