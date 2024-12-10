@@ -12,6 +12,7 @@ struct mincostFlow{
     F getCap(){ return cap-flow; }
   };
   using P = pair<C,F>;
+  const C CINF=numeric_limits<C>::max()/2;
 
   int n;
   vector<vector<int>> adj;
@@ -30,7 +31,7 @@ struct mincostFlow{
     adj[v].eb(e.size()), e.eb(u,0,-cost);
   }
   bool dijk(int s,int t){
-    d.assign(n,4e18), path.assign(n,-1);
+    d.assign(n,CINF), path.assign(n,-1);
     d[s]=0;
     pq.emplace(0,s);
     while(!pq.empty()){
@@ -43,7 +44,7 @@ struct mincostFlow{
         pq.emplace(d[e[id].to], e[id].to);
       }
     }
-    return d[t] < 4e18;
+    return d[t] < CINF;
   }
   pair<F,C> flow(int s,int t,F K){ // required flow <= K
     F f=0;
