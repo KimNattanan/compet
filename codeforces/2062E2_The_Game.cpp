@@ -38,9 +38,9 @@ struct segment{
 vector<int> adj[400005],a[400005];
 int op[400005],ed[400005],id;
 
-void dfs0(int u,int p){
+void dfs(int u,int p){
   op[u]=++id;
-  for(auto &v:adj[u]) if(v!=p) dfs0(v,u);
+  for(auto &v:adj[u]) if(v!=p) dfs(v,u);
   ed[u]=id;
 }
 
@@ -55,7 +55,7 @@ void solve(){
     int u,v; cin>>u>>v;
     adj[u].eb(v), adj[v].eb(u);
   }
-  id=0, dfs0(1,1);
+  id=0, dfs(1,1);
   vector<int> ans;
   t1.build(1,n), t2.build(1,n);
   for(int i=n;i>=1;--i){
