@@ -39,13 +39,23 @@ struct segment{
     if(il==ir) return il;
     int mid=il+ir>>1;
     flush(i,il,ir);
-    flush(i<<1|1,mid+1,ir);
     flush(i<<1,il,mid);
+    flush(i<<1|1,mid+1,ir);
     if(mid<l) return qr2(i<<1|1,mid+1,ir,l,r,vl+a[i<<1],vr);
     if(mid>=r) return qr2(i<<1,il,mid,l,r,vl,vr+a[i<<1|1]);
     if(a[i<<1]+vl<a[i<<1|1]+vr-b[i<<1|1]) return qr2(i<<1|1,mid+1,ir,l,r,vl+a[i<<1],vr);
     return qr2(i<<1,il,mid,l,r,vl,vr+a[i<<1|1]);
   }
+  int qr2(int l,int r,ll vl,ll vr){ return qr2(1,l0,r0,l,r,vl,vr); }
+  int lb(int i,int il,int ir,ll v,ll vl){
+    if(il==ir) return il;
+    int mid=il+ir>>1;
+    flush(i,il,ir);
+    flush(i<<1,il,mid);
+    if(a[i<<1]+vl>=v) return lb(i<<1,il,mid,v,vl);
+    return lb(i<<1|1,mid+1,ir,v,vl+a[i<<1]);
+  }
+  int lb(ll v){ return lb(1,l0,r0,v,0); }
 }t;
 
 void init(int N) {
@@ -59,5 +69,5 @@ long long countSize(int L,int R) {
 }
 int bestPartition(int L,int R) {
   if(L==R) return L;
-  return t.qr2(1,t.l0,t.r0,L,R,-t.qr(0,L-1),-t.qr(R+1,t.r0));
+  return max(L,t.lb(t.qr(0,t.qr2(L,R,-t.qr(0,L-1),-t.qr(R+1,t.r0)))));
 }
