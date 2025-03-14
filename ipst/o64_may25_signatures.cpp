@@ -30,7 +30,7 @@ string cur,best;
 void dfs(int u){
   if(sz(cur)>sz(best)){
     best=cur;
-    cout<<best<<'\n';
+    cout<<best<<endl;
   }
   for(auto &[v,b]:adj[u]){
     if(used[u<<1|b]) continue;
