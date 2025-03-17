@@ -15,11 +15,8 @@ const ll linf=1e18;
 const ll md=1e9+7;
 
 ll a[100005],b[100005],ans[200005];
-char state[100005];
 using A=tuple<ll,ll,int>;
-multiset<tuple<ll,ll,int>> ms,ms2;
 priority_queue<A,vector<A>,greater<A>> pq;
-bitset<100005> ch;
 
 int main(){
   ios::sync_with_stdio(false); cin.tie(0);
@@ -27,6 +24,7 @@ int main(){
   int n; cin>>n;
   for(int i=1;i<=n;++i) cin>>a[i];
   for(int i=1;i<=n;++i) cin>>b[i];
+  
   for(int i=n<<1;i>0;--i) ans[i]=1e18;
   int cnt=0;
   ll sum=0,mx=-1e18;
@@ -44,7 +42,7 @@ int main(){
       ms.erase(ms.find(u1));
     }
     else{
-      ans[cnt+1]=min(sum+a[iu]+b[iu]-mx,sum+(*ms.lower_bound(b[iu])));
+      ans[cnt+1]=min(sum+a[iu]+b[iu]-mx, sum+(*ms.lower_bound(b[iu])));
       ans[cnt+=2]=(sum+=a[iu]+b[iu]);
       mx=max(mx,b[iu]);
       ms.erase(ms.find(a[iu]));
@@ -56,5 +54,4 @@ int main(){
     ll k; cin>>k;
     cout<<(upper_bound(ans+1,ans+(n<<1|1),k)-ans-1)<<'\n';
   }
-
 }
