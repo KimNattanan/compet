@@ -1,84 +1,60 @@
 #include "connection.h"
 #include<bits/stdc++.h>
 using namespace std;
-using pii=pair<int,int>;
 using ll=long long;
+using pii=pair<int,int>;
 #define f first
 #define s second
 #define eb emplace_back
+#define sz(x) (int)x.size()
+#define add(x,y) ((x+y)%md)
+#define Add(x,y) (x=add(x,y))
+#define mul(x,y) ((x*y)%md)
+#define Mul(x,y) (x=mul(x,y))
+template<class T> T chmn(T &x,T y){ return x=min(x,y); }
+template<class T> T chmx(T &x,T y){ return x=max(x,y); }
+const int inf=1e9;
+const ll linf=1e18;
+const ll md=1e9+7;
 
-vector<int> adj[1000005],adj2[3000005];
-int disc[1000005],low[1000005],nds[1000005],id,sz[3000005],H[3000005],p[3000005],dp[3000005];
-bitset<1000005> isap;
-bitset<3000005> use_mx;
-vector<vector<int>> comps;
-stack<int> st;
+vector<int> adj[1000005];
+bitset<1000005> isMax;
 
-void tarj(int u,int p){
+struct BCC{
+  int disc[1000005],low[1000005],id;
+  bitset<1000005> ap;
+  stack<int> st;
+  vector<vector<int>> comp;
+  void tarj(int u,int p){
     disc[u]=low[u]=++id;
     st.emplace(u);
-    for(auto &v:adj[u]){
-        if(v==p) continue;
-        if(!disc[v]){
-            tarj(v,u);
-            low[u]=min(low[u],low[v]);
-            if(low[v]>=disc[u]){
-                isap[u]=(disc[u]>1||disc[v]>2);
-                comps.eb(vector<int>{u});
-                while(comps.back().back()!=v) comps.back().eb(st.top()), st.pop();
-            }
+    for(auto &v:adj[u]) if(v!=p){
+      if(!disc[v]){
+        tarj(v,u);
+        if(low[v]>=disc[u]){
+          ap[u] = (p!=-1 || low[v]!=disc[u]);
+          comp.eb(vector<int>{u});
+          while(comp.back().back()!=v) comp.back().eb(st.top()), st.pop();
         }
-        else low[u]=min(low[u],disc[v]);
+        else chmn(low[u],low[v]);
+      }
+      else low[u]=min(low[u],disc[v]);
     }
-}
+  }
+  void init(){
+    tarj(0,-1);
+  }
+}bcc;
 
-int fSet(int u){ return p[u]==u ? u : p[u]=fSet(p[u]); }
-
-int recommended_stations(int N, int M, std::vector<int> H0, std::vector<int> U0, std::vector<int> V0) {
-    for(int i=0;i<M;++i) adj[U0[i]].eb(V0[i]), adj[V0[i]].eb(U0[i]);
-    id=0, tarj(0,0);
-
-    vector<int> vec;
-    id=0;
-    for(int i=0;i<N;++i){
-        if(!isap[i]) continue;
-        vec.eb(++id);
-        p[id]=id;
-        nds[i]=id;
-        sz[id]=1;
-        H[id]=H0[i];
-    }
-    int last_ap=id;
-    while(!comps.empty()){
-        vec.eb(++id);
-        p[id]=id;
-        H[id]=-1;
-        for(auto &e:comps.back()) if(!isap[e]) nds[e]=id, H[id]=max(H[id],H0[e]), ++sz[id];
-        for(auto &e:comps.back()){
-            if(!isap[e]) continue;
-            if(H[id]>H[nds[e]]) adj2[id].eb(nds[e]);
-            else adj2[nds[e]].eb(id);
-        }
-        comps.pop_back();
-    }
-    sort(vec.begin(),vec.end(),[&](const int &l,const int &r){
-        return H[l]<H[r];
-    });
-    for(auto &u:vec){
-        if(sz[u]==0) continue;
-        dp[u]=sz[u]-1;
-        for(auto &v:adj2[u]){
-            int V=fSet(v);
-            p[V]=u;
-            dp[u]+=dp[V];
-            if(u<=last_ap&&use_mx[v]) ++dp[u],use_mx[v]=0;
-        }
-        if(sz[u]==1){
-            if(dp[u]==0) dp[u]=1;
-            else if(u>last_ap) use_mx[u]=1;
-        }
-        else use_mx[u]=1;
-    }
-
-    return dp[fSet(1)];
+int recommended_stations(int N, int M, std::vector<int> H, std::vector<int> U, std::vector<int> V) {
+  for(int i=0;i<M;++i) adj[U[i]].eb(V[i]), adj[V[i]].eb(U[i]);
+  bcc.init();
+  for(auto &c:bcc.comp){
+    pii mx(-1,0);
+    for(auto &u:c) chmx(mx,{H[u],u});
+    isMax[mx.s]=1;
+  }
+  int ans=0;
+  for(int i=0;i<N;++i) ans+=!isMax[i];
+  return ans;
 }
