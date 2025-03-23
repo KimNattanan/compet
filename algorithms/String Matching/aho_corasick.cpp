@@ -18,11 +18,6 @@ struct Aho{
 
   Aho():rt(new node()){}
   
-  pnode find_suf(pnode t,int i){
-    while(t!=rt && !t->adj[i]) t=t->suf;
-    if(t->adj[i]) return t->adj[i];
-    return rt;
-  }
   pnode insert(string s){
     pnode t=rt;
     for(auto &e:s){
@@ -31,6 +26,11 @@ struct Aho{
       else t=t->adj[i]=new node();
     }
     return t;
+  }
+  pnode find_suf(pnode t,int i){
+    while(t!=rt && !t->adj[i]) t=t->suf;
+    if(t->adj[i]) return t->adj[i];
+    return rt;
   }
   void build(){
     rt->suf=rt;
