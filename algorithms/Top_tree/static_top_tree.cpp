@@ -21,8 +21,7 @@ const ll md=119<<23|1;
 vector<int> adj[100005];
 
 struct Stt{
-  int P[400005],L[400005],R[400005],n,rt;
-  int T[400005];
+  int P[400005],L[400005],R[400005],T[400005],n,rt;
   /*
     T:{
       0: node
