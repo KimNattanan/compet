@@ -21,8 +21,8 @@ const ll md=119<<23|1;
 vector<int> adj[200005];
 
 struct Stt{
-  int P[1<<19],L[1<<19],R[1<<19],n,rt;
-  bitset<1<<19> T; // 0: path cluster,  1: point cluster
+  int P[800005],L[800005],R[800005],n,rt;
+  bitset<800005> T; // 0: path cluster,  1: point cluster
   int hld(int u){
     int su=1,mx=0;
     for(auto &v:adj[u]){
