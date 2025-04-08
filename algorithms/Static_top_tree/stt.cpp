@@ -22,6 +22,7 @@ vector<int> adj[200005];
 
 struct Stt{
   int P[1<<19],L[1<<19],R[1<<19],n,rt;
+  bitset<1<<19> T; // 0: path cluster,  1: point cluster
   int hld(int u){
     int su=1,mx=0;
     for(auto &v:adj[u]){
@@ -35,11 +36,11 @@ struct Stt{
     n=hld(u);
     rt=compress(u);
   }
-  int node(int u,int l,int r){
+  int node(int u,int l,int r,bool t=false){
     if(u==-1) u=++n;
     if(l!=-1) P[l]=u;
     if(r!=-1) P[r]=u;
-    P[u]=-1, L[u]=l, R[u]=r;
+    P[u]=-1, L[u]=l, R[u]=r, T[u]=t;
     return u;
   }
   int compress(int u){
@@ -55,20 +56,20 @@ struct Stt{
     vector<int> chs;
     for(int i=1;i<sz(adj[u]);++i) chs.eb(add_edge(adj[u][i]));
     if(chs.empty()) return -1;
-    return merge(chs);
+    return merge(chs, true);
   }
   int add_edge(int u){
     int v=compress(u);
-    u=node(-1,v,-1);
+    u=node(-1,v,-1,true);
     return u;
   }
-  int merge(vector<int> &chs){
+  int merge(vector<int> &chs,bool t=false){
     if(sz(chs)==1) return chs[0];
     vector<int> chl,chr;
     for(int i=0;i<sz(chs)>>1;++i) chl.eb(chs[i]);
     for(int i=sz(chs)>>1;i<sz(chs);++i) chr.eb(chs[i]);
     int l=merge(chl), r=merge(chr);
-    int u=node(-1,l,r);
+    int u=node(-1,l,r,t);
     return u;
   }
 }stt;
