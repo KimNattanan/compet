@@ -18,25 +18,40 @@ const ll linf=1e18;
 const ll md=119<<23|1;
 
 
-vector<int> adj[200005];
+vector<int> adj[100005];
 
 struct Stt{
-  int P[800005],L[800005],R[800005],n,rt;
-  bitset<800005> T; // 0: path cluster,  1: point cluster
-  int hld(int u){
+  int P[400005],L[400005],R[400005],n,rt;
+  int T[400005];
+  /*
+    T:{
+      0: node
+      1: add_edge
+      2: rake
+      3: add_node
+      4: compress
+    }
+  */
+  int hld(int u,int p){
     int su=1,mx=0;
-    for(auto &v:adj[u]){
-      int sv=hld(v);
+    for(auto &v:adj[u]) if(v!=p){
+      int sv=hld(v,u);
       su+=sv;
       if(mx<sv) mx=sv, swap(v,adj[u][0]);
+    }
+    for(auto &v:adj[u]) if(v==p){
+      swap(v,adj[u].back());
+      adj[u].pop_back();
+      break;
     }
     return su;
   }
   void build(int u){
-    n=hld(u);
+    n=hld(u,u);
+    for(int i=n<<2;i>=0;--i) P[i]=L[i]=R[i]=-1;
     rt=compress(u);
   }
-  int node(int u,int l,int r,bool t=false){
+  int node(int u,int l,int r,int t){
     if(u==-1) u=++n;
     if(l!=-1) P[l]=u;
     if(r!=-1) P[r]=u;
@@ -46,29 +61,29 @@ struct Stt{
   int compress(int u){
     vector<int> chs{add_node(u)};
     while(!adj[u].empty()) chs.eb(add_node(u=adj[u][0]));
-    return merge(chs);
+    return merge(chs,4);
   }
   int add_node(int u){
     int v=rake(u);
-    return node(u,v,-1);
+    return node(u,v,-1,v==-1 ? 0 : 3);
   }
   int rake(int u){
     vector<int> chs;
     for(int i=1;i<sz(adj[u]);++i) chs.eb(add_edge(adj[u][i]));
     if(chs.empty()) return -1;
-    return merge(chs, true);
+    return merge(chs, 2);
   }
   int add_edge(int u){
     int v=compress(u);
-    u=node(-1,v,-1,true);
+    u=node(-1,v,-1,1);
     return u;
   }
-  int merge(vector<int> &chs,bool t=false){
+  int merge(vector<int> &chs,int t){
     if(sz(chs)==1) return chs[0];
     vector<int> chl,chr;
     for(int i=0;i<sz(chs)>>1;++i) chl.eb(chs[i]);
     for(int i=sz(chs)>>1;i<sz(chs);++i) chr.eb(chs[i]);
-    int l=merge(chl), r=merge(chr);
+    int l=merge(chl,t), r=merge(chr,t);
     int u=node(-1,l,r,t);
     return u;
   }
