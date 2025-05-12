@@ -1,50 +1,54 @@
+#include "skytrain.h"
 #include<bits/stdc++.h>
 using namespace std;
-using pii=pair<int,int>;
 using ll=long long;
+using pii=pair<int,int>;
+#define f first
+#define s second
 #define eb emplace_back
-#include "skytrain.h"
-
-using A=pair<ll,int>;
+#define sz(x) (int)x.size()
+#define add(x,y) ((((x)+(y))%md+md)%md)
+#define Add(x,y) (x=add(x,y))
+#define mul(x,y) ((((x)*(y))%md+md)%md)
+#define Mul(x,y) (x=mul(x,y))
+template<class T> T chmn(T &x,T y){ return x=min(x,y); }
+template<class T> T chmx(T &x,T y){ return x=max(x,y); }
+const int inf=1e9;
+const ll linf=1e18;
+const ll md=1e9+7;
+// const ll md=119<<23|1;
 
 vector<pii> adj[100005];
-ll cost[200005], d[100005];
-priority_queue<A,vector<A>,greater<A>> pq;
+ll w[200005],d[200005];
 
+using A=pair<ll,int>;
+priority_queue<A,vector<A>,greater<A>> pq;
 void dijk(){
-    while(!pq.empty()){
-        auto [w,u]=pq.top(); pq.pop();
-        if(d[u]!=w) continue;
-        for(auto &[v,vw]:adj[u]){
-            if(d[v]>w+cost[vw]) d[v]=w+cost[vw], pq.emplace(d[v],v);
-        }
-    }
+  while(!pq.empty()){
+    auto [x,u]=pq.top(); pq.pop();
+    if(d[u]!=x) continue;
+    for(auto &[v,vi]:adj[u]) if(d[v]>x+w[vi]) pq.emplace(d[v]=x+w[vi], v);
+  }
 }
 
-long long min_total_cost(int N, int M, std::vector<int> U, std::vector<int> V, std::vector<int> W, long long K, int X, int Y) {
-    for(int i=0;i<M;++i) adj[U[i]].eb(V[i],i), adj[V[i]].eb(U[i],i);
-
-    int ans=(1<<30)-1;
-    for(int i=1<<29;i>0;i>>=1){
-        ans^=i;
-        for(int j=0;j<M;++j){
-            cost[j]=W[j];
-            bool ok=1;
-            for(int k=1<<29;k>0;k>>=1){
-                if(ans&k || !(W[j]&k)) continue;
-                cost[j]=min(cost[j], ll(  (W[j]&(k-1))+1+((~ans)&(k-1))  ) );
-                int l=k<<1;
-                while(W[j]&l) l<<=1;
-                if(ans&l) cost[j]=min(cost[j],1+ ll(  (~W[j])&((k<<1)-1)  ) );
-                ok=0;
-                break;
-            }
-            if(ok) cost[j]=0;
-        }
-        for(int i=0;i<N;++i) d[i]=1e18;
-        d[X]=0, pq.emplace(0,X), dijk();
-        if(d[Y]>K) ans^=i;
+long long min_total_cost(int N, int M, std::vector<int> A, std::vector<int> B, std::vector<int> W, long long K, int X, int Y) {
+  for(int i=0;i<M;++i) adj[A[i]].eb(B[i],i), adj[B[i]].eb(A[i],i);
+  ll ans = (1<<30)-1;
+  for(int i=29;i>=0;--i){
+    ans ^= 1<<i;
+    for(int j=0;j<M;++j){
+      w[j] = 0;
+      for(int k=29;k>=0;--k) if((1<<k&W[j]) && !(1<<k&ans)){
+        w[j] = ((1<<k)-1&W[j]) + ((1<<k)-((1<<k)-1&ans));
+        int w2 = (W[j]|((1<<k)-1))+1;
+        if((w2&ans)==w2) chmn(w[j], ll(w2-W[j]));
+        break;
+      }
     }
-    return ans;
-
+    fill(d,d+N,linf);
+    pq.emplace(d[X]=0, X);
+    dijk();
+    if(d[Y]>K) ans ^= 1<<i;
+  }
+  return ans;
 }
