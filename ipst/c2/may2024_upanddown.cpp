@@ -1,117 +1,112 @@
 #include "upanddown.h"
 #include<bits/stdc++.h>
 using namespace std;
-using pii=pair<int,int>;
 using ll=long long;
+using pii=pair<int,int>;
 #define f first
 #define s second
 #define eb emplace_back
-
+#define sz(x) (int)x.size()
+#define add(x,y) ((((x)+(y))%md+md)%md)
+#define Add(x,y) (x=add(x,y))
+#define mul(x,y) ((((x)*(y))%md+md)%md)
+#define Mul(x,y) (x=mul(x,y))
+template<class T> T chmn(T &x,T y){ return x=min(x,y); }
+template<class T> T chmx(T &x,T y){ return x=max(x,y); }
+const int inf=1e9;
+const ll linf=1e18;
 const ll md=1e9+7;
+// const ll md=119<<23|1;
 
-struct segment{
-	ll a[1<<20];
-	int l0,r0;
-	void build(int l,int r){l0=l, r0=r;}
-	void upd1(int i,int il,int ir,int id,ll v){
-		if(il==ir) return void(a[i]=(a[i]+v)%md);
-		int mid=il+ir>>1;
-		if(id<=mid) upd1(i<<1,il,mid,id,v);
-		else upd1(i<<1|1,mid+1,ir,id,v);
-		a[i]=(a[i<<1]+a[i<<1|1])%md;
-	}
-	ll qr(int i,int il,int ir,int l,int r){
-		if(l>r) return 0;
-		if(l<=il&&ir<=r) return a[i];
-		if(il>r||ir<l) return 0;
-		int mid=il+ir>>1;
-		return (qr(i<<1,il,mid,l,r)+qr(i<<1|1,mid+1,ir,l,r))%md;
-	}
-	void upd1(int id,ll v){upd1(1,l0,r0,id,v);}
-	ll qr(int l,int r){return qr(1,l0,r0,l,r);}
-}dp[4];
-
-struct segment2{
-	struct node{
-		node *l,*r;
-		int sum;
-		node(int sum=0):sum(sum),l(nullptr),r(nullptr){}
-	};
-	using pnode=node*;
-	pnode rt[200005];
-	int l0,r0;
-	void build(pnode &t,int il,int ir){
-		t=new node();
-		if(il==ir) return;
-		int mid=il+ir>>1;
-		build(t->l,il,mid), build(t->r,mid+1,ir);
-	}
-	void build(int l,int r){
-		l0=l, r0=r;
-		build(rt[0],l,r);
-	}
-	void upd(pnode t0,pnode &t1,int il,int ir,int id,int x){
-		t1=new node(*t0);
-		if(il==ir) return void(t1->sum+=x);
-		int mid=il+ir>>1;
-		if(id<=mid) upd(t0->l,t1->l,il,mid,id,x);
-		else upd(t0->r,t1->r,mid+1,ir,id,x);
-		t1->sum=(t1->l->sum)+(t1->r->sum);
-	}
-	void upd(int v0,int v1,int id,int x){upd(rt[v0],rt[v1],l0,r0,id,x);}
-	int qr(pnode t0,pnode t1,int il,int ir,int l,int r){
-		if(l<=il&&ir<=r) return t1->sum-t0->sum;
-		if(il>r||ir<l) return 0;
-		int mid=il+ir>>1;
-		return qr(t0->l,t1->l,il,mid,l,r)+qr(t0->r,t1->r,mid+1,ir,l,r);
-	}
-	int qr(int v0,int v1,int l,int r){return l>r ? 0 : qr(rt[v0],rt[v1],l0,r0,l,r);}
+struct persist{
+  struct node{
+    node *l,*r;
+    int t;
+    node(int x=0):l(nullptr),r(nullptr),t(x){}
+  };
+  using pnode=node*;
+  vector<pnode> rt;
+  int l0,r0;
+  void init(int n,int l,int r){
+    rt.resize(n);
+    l0=l,r0=r;
+    build(rt[0],l,r);
+  }
+  void build(pnode &t,int il,int ir){
+    t=new node();
+    if(il==ir) return;
+    int mid=il+ir>>1;
+    build(t->l,il,mid), build(t->r,mid+1,ir);
+  }
+  void upd(pnode t0,pnode &t1,int il,int ir,int id,int x){
+    t1=new node(*t0);
+    ++(t1->t);
+    if(il==ir) return;
+    int mid=il+ir>>1;
+    if(id<=mid) upd(t0->l,t1->l,il,mid,id,x);
+    else upd(t0->r,t1->r,mid+1,ir,id,x);
+  }
+  void upd(int t0,int t1,int id,int x){ upd(rt[t0],rt[t1],l0,r0,id,x); }
+  int qr(pnode t0,pnode t1,int il,int ir,int l,int r){
+    if(il>r||ir<l) return 0;
+    if(l<=il&&ir<=r) return t1->t - t0->t;
+    int mid=il+ir>>1;
+    return qr(t0->l,t1->l,il,mid,l,r) + qr(t0->r,t1->r,mid+1,ir,l,r);
+  }
+  int qr(int t0,int t1,int l,int r){ return qr(rt[t0],rt[t1],l0,r0,l,r); }
 }t;
+vector<int> comp;
+int xid[200005];
 
-ll add(const ll &x,const ll &y){ return ((x+y)%md+md)%md; }
-vector<int> pos[200005];
+struct fenwick{
+  vector<ll> bit;
+  ll sum;
+  void init(int n){ bit.assign(n,0); sum=0; }
+  void upd(int i,ll x){ for(++i;i<sz(bit);i+=i&-i) Add(bit[i],x); Add(sum,x); }
+  ll qr(int i){
+    ll res=0;
+    for(++i;i>0;i-=i&-i) Add(res,bit[i]);
+    return res;
+  }
+}dp[5];
 
-long long upanddown(int N,
-		    std::vector<int> X)
-{
-	vector<int> comp=X;
-	sort(comp.begin(),comp.end());
-	comp.erase(unique(comp.begin(),comp.end()),comp.end());
-	for(auto &e:X) e=lower_bound(comp.begin(),comp.end(),e)-comp.begin()+1;
-	int n=comp.size();
-
-	for(int i=0;i<4;++i) dp[i].build(1,n);
-	ll ans=0;
-	for(int i=0;i<N;++i){
-		ans=add(ans,dp[3].qr(X[i]+1,n));
-		dp[3].upd1(X[i],dp[2].qr(X[i]+1,n));
-		dp[2].upd1(X[i],dp[1].qr(1,X[i]-1));
-		dp[1].upd1(X[i],dp[0].qr(1,X[i]-1));
-		dp[0].upd1(X[i],1);
-	}
-
-	t.build(1,n);
-	for(int i=1;i<=N;++i) t.upd(i-1,i,X[i-1],1), pos[X[i-1]].eb(i);
-	for(int i=1;i<=n;++i){
-		if(pos[i].size()<=1) continue;
-		ll sum=0;
-
-		vector<ll> u,d;
-		d.eb(t.qr(0,pos[i][0],1,i-1)), u.eb(t.qr(0,pos[i][0],i+1,n));
-		for(int j=1;j<pos[i].size();++j) d.eb(t.qr(pos[i][j-1],pos[i][j],1,i-1)), u.eb(t.qr(pos[i][j-1],pos[i][j],i+1,n));
-		d.eb(t.qr(pos[i].back(),N,1,i-1)), u.eb(t.qr(pos[i].back(),N,i+1,n));
-
-		ll b=(d[0]*u[1])%md,a=(2*d[0]+d[1])%md,c=d[0]+d[1],sumd=-d[0]-d[1];
-		for(auto &e:d) sumd+=e;
-		for(int j=2;j<=pos[i].size();++j){
-			sum=add(sum,(b*sumd)%md);
-			sumd-=d[j];
-			b=(b+a*u[j])%md;
-			c=c+d[j];
-			a=(a+c)%md;
-		}
-		ans=add(ans,-sum);
-	}
-
-	return ans;
+ll upanddown(int N,vector<int> X){
+  comp=X;
+  sort(comp.begin(),comp.end());
+  comp.erase(unique(comp.begin(),comp.end()),comp.end());
+  for(int i=0;i<N;++i) xid[i] = upper_bound(comp.begin(),comp.end(),X[i])-comp.begin();
+  vector<int> nds(N);
+  iota(nds.begin(),nds.end(),0);
+  sort(nds.begin(),nds.end(),[&](const int &l,const int &r){
+    return X[l]!=X[r] ? X[l]<X[r] : l<r;
+  });
+  t.init(sz(comp)+5,0,N-1);
+  int prv=0;
+  for(auto &i:nds){
+    t.upd(prv,xid[i],i,1);
+    prv=xid[i];
+  }
+  ll ans=0,sum1,sum2;
+  prv=-1;
+  for(auto &i:nds){
+    if(prv==-1 || xid[i]!=xid[prv]) sum1=sum2=0;
+    else{
+      ll x1 = t.qr(xid[i],sz(comp),prv,i);
+      ll x2 = t.qr(0,xid[i]-1,0,prv);
+      ll x3 = t.qr(0,xid[i]-1,i,N-1);
+      Add(sum1,x2);
+      Add(sum2,mul(x1,sum1));
+      Add(ans,mul(sum2,x3));
+    }
+    prv=i;
+  }
+  for(int i=0;i<5;++i) dp[i].init(sz(comp)+5);
+  for(int i=0;i<N;++i){
+    dp[4].upd(xid[i], dp[3].sum-dp[3].qr(xid[i]));
+    dp[3].upd(xid[i], dp[2].sum-dp[2].qr(xid[i]));
+    dp[2].upd(xid[i], dp[1].qr(xid[i]-1));
+    dp[1].upd(xid[i], dp[0].qr(xid[i]-1));
+    dp[0].upd(xid[i], 1);
+  }
+  return add(dp[4].sum,-ans);
 }
