@@ -1,59 +1,38 @@
 #include "sailing.h"
 #include<bits/stdc++.h>
 using namespace std;
-using pii=pair<int,int>;
-using ll=long long;
-#define f first
-#define s second
-#define eb emplace_back
 
-const int MX=32;
+// #define SUB1
+#define go sail_forward
+#define back sail_backward
+const int K=32;
 
 mt19937 rng(time(0));
-bitset<MX> pat;
-bool pat0[]={1,0,1,0,0,1,0,0,0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1};
-deque<bool> cur;
-
-bool check(){
-  for(int i=0;i<MX;++i) if(cur.end()[-1-i]!=pat[i]) return 0;
-  return 1;
-}
-
-int sub1(){
-  flag();
-  for(int i=3;i<=5000;++i){
-    for(int j=1;j<i;++j) if(sail_forward()) flag();
-    for(int j=2;j<i;++j) sail_backward();
-    if(!sail_backward()) return i-1;
-  }
-}
+int pat[K+5],cur[1000005];
 
 int set_sail() {
-  
-  return sub1();
-
-  cur.clear();
-  for(int i=0;i<MX;++i) pat[i]=pat0[i];//rng()%2;
-  if(pat[0]) flag();
-  for(int i=1;i<MX;++i){
-    if(sail_forward()!=pat[i]) flag();
-  }
-  for(int i=MX-2;i>=0;--i){
-    if(sail_backward()!=pat[i]){
-      int n2=MX-i;
-      for(int j=0;j<n2;++j) if(sail_forward()) flag();
-      int ans=1;
-      flag();
-      for(int j=0;j<n2;++j){
-        if(sail_forward()) break;
-        flag();
-        ++ans;
-      }
-      return ans;
+  #ifdef SUB1
+    flag();
+    bool z=0;
+    for(int i=2;;++i){
+      for(int j=0;j<i;++j) if(go()) flag();
+      for(int j=0;j<i;++j) if(!back() && j==i-1) return i;
     }
+  #endif
+
+  flag();
+  int ans;
+  for(int i=1;i<K;++i) if(go()) ans=i, flag();
+  for(int i=1;i<K;++i) if(!back() && i==K-1) return ans;
+  ans=K;
+  for(int i=0;i<K;++i) pat[i]=rng()&1;
+  for(int i=0;i<K;++i) if(go()!=pat[i]) flag();
+  for(int i=1;i<K;++i) cur[i]=go();
+  for(int i=K;;++i){
+    cur[i]=go();
+    bool ok=1;
+    for(int j=i-K+1;j<=i;++j) ok &= (cur[j]==pat[j-(i-K+1)]);
+    if(ok) return ans;
+    ++ans;
   }
-  for(int i=0;i<MX;++i) cur.eb(sail_backward());
-  int ans=MX;
-  while(!check()) cur.eb(sail_backward()), cur.pop_front(), ++ans;
-  return ans;
 }
