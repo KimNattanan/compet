@@ -12,10 +12,11 @@ struct treap{
         ll prio;
         ll val;
         bool lazy;
-        node(ll val_=0):l(nullptr),r(nullptr),sz(1),prio(rng()),val(val_),lazy(0){}
+        node(ll val=0):l(nullptr),r(nullptr),sz(1),prio(rng()),val(val),lazy(0){}
     };
     using pnode=node*;
     pnode rt;
+    treap():rt(nullptr){}
     int sz(pnode t){return t?t->sz:0;}
     void flush(pnode t){
         if(t&&t->lazy){

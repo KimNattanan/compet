@@ -11,10 +11,11 @@ struct treap{
         int sz;
         ll prio;
         ll val;
-        node(ll val_=0):l(nullptr),r(nullptr),sz(1),prio(rng()),val(val_){}
+        node(ll val=0):l(nullptr),r(nullptr),sz(1),prio(rng()),val(val){}
     };
     using pnode=node*;
     pnode rt;
+    treap():rt(nullptr){}
     int sz(pnode t){return t?t->sz:0;}
     void upd(pnode t){
         if(!t) return;
