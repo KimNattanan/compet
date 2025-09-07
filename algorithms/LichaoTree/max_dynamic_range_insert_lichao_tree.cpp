@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 using namespace std;
-#include "particle.h"
 using ll=long long;
 #define eb emplace_back
  

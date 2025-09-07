@@ -7,8 +7,6 @@ using namespace std;
 #define s second
 #define pb push_back
 
-//#define int ll
-
 int n,k;
 vector<int> adj[100005];
 int C[100005];
