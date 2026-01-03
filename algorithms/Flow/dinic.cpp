@@ -2,7 +2,8 @@
 using namespace std;
 #define eb emplace_back
 
-// O(EVlogU)
+// O(EVlogC)
+// O(E√V) ; bipartite
 template<class F>
 struct dinic{
   struct E{
@@ -14,7 +15,7 @@ struct dinic{
   const F FINF=numeric_limits<F>::max()/2;
  
   int n;
-  F maxCap; // U
+  F maxCap; // C
   vector<vector<int>> adj;
   vector<E> e;
   queue<int> q;
